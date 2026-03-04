@@ -7,6 +7,8 @@ out-tsc
 
 # dependencies
 node_modules
+apps/client/.output
+apps/client/.content-collections
 
 # IDEs and editors
 /.idea
@@ -42,3 +44,10 @@ Thumbs.db
 .nx/workspace-data
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+
+test-output
+
+vite.config.*.timestamp*
+
+# keys / secrets
+*.pem

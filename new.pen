@@ -1,0 +1,345 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "owcZO",
+      "x": 80,
+      "y": 80,
+      "name": "Nx GitHub to EC2 Flow",
+      "width": 1980,
+      "height": 760,
+      "fill": "#F8FAFC",
+      "cornerRadius": 20,
+      "layout": "vertical",
+      "gap": 28,
+      "padding": 32,
+      "children": [
+        {
+          "type": "text",
+          "id": "HuDz5",
+          "name": "title",
+          "fill": "#000000",
+          "content": "Basic GitHub Flow to EC2 Deployment (Nx Fullstack)",
+          "fontFamily": "Inter",
+          "fontSize": 34,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "NBBNO",
+          "name": "subtitle",
+          "fill": "#000000",
+          "content": "Monorepo example: apps/web + apps/api, deployed from GitHub Actions to one EC2 host",
+          "fontFamily": "Inter",
+          "fontSize": 18,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "cGfNk",
+          "name": "Main Flow",
+          "gap": 14,
+          "padding": 8,
+          "children": [
+            {
+              "type": "frame",
+              "id": "P1WDt",
+              "name": "Step 1",
+              "width": 320,
+              "height": 170,
+              "fill": "#DBEAFE",
+              "cornerRadius": 14,
+              "layout": "vertical",
+              "gap": 6,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "uYdaM",
+                  "name": "step1h",
+                  "fill": "#000000",
+                  "content": "1) Create feature branch and PR",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "FXBZJ",
+                  "name": "tmp1",
+                  "fill": "#000000",
+                  "content": "Code in Nx repo, open PR to main",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "TXv57",
+              "name": "a1",
+              "fill": "#000000",
+              "content": "->",
+              "fontFamily": "Inter",
+              "fontSize": 28,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "pJVOk",
+              "name": "Step 2",
+              "width": 320,
+              "height": 170,
+              "fill": "#E0E7FF",
+              "cornerRadius": 14,
+              "layout": "vertical",
+              "gap": 6,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "upZ2Q",
+                  "name": "step2h",
+                  "fill": "#000000",
+                  "content": "2) PR CI checks",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "H03pn",
+                  "name": "tmp2",
+                  "fill": "#000000",
+                  "content": "Run nx affected lint, test, build",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "QXi9w",
+              "name": "a2",
+              "fill": "#000000",
+              "content": "->",
+              "fontFamily": "Inter",
+              "fontSize": 28,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "xfOb7",
+              "name": "Step 3",
+              "width": 320,
+              "height": 170,
+              "fill": "#DCFCE7",
+              "cornerRadius": 14,
+              "layout": "vertical",
+              "gap": 6,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Adl9i",
+                  "name": "step3h",
+                  "fill": "#000000",
+                  "content": "3) Merge PR to main",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "P1DS1",
+                  "name": "tmp3",
+                  "fill": "#000000",
+                  "content": "Merge to main starts deploy workflow",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "VF02z",
+              "name": "a3",
+              "fill": "#000000",
+              "content": "->",
+              "fontFamily": "Inter",
+              "fontSize": 28,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "IXMD4",
+              "name": "Step 4",
+              "width": 320,
+              "height": 170,
+              "fill": "#FEF3C7",
+              "cornerRadius": 14,
+              "layout": "vertical",
+              "gap": 6,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "12rU6",
+                  "name": "step4h",
+                  "fill": "#000000",
+                  "content": "4) Build and publish artifacts",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "uBptX",
+                  "name": "tmp4",
+                  "fill": "#000000",
+                  "content": "Build web/api images, push to registry",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "Ev0gz",
+              "name": "a4",
+              "fill": "#000000",
+              "content": "->",
+              "fontFamily": "Inter",
+              "fontSize": 28,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "xdv7b",
+              "name": "Step 5",
+              "width": 360,
+              "height": 170,
+              "fill": "#FEE2E2",
+              "cornerRadius": 14,
+              "layout": "vertical",
+              "gap": 6,
+              "padding": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "MdRDU",
+                  "name": "step5h",
+                  "fill": "#000000",
+                  "content": "5) Deploy to EC2",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "LFJWv",
+                  "name": "tmp5",
+                  "fill": "#000000",
+                  "content": "EC2 pull, migrate DB, restart, health check",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "7n31z",
+          "name": "Workflow Jobs",
+          "width": 1730,
+          "fill": "#E2E8F0",
+          "cornerRadius": 14,
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 18,
+          "children": [
+            {
+              "type": "text",
+              "id": "oIAW4",
+              "name": "jobTitle",
+              "fill": "#000000",
+              "content": "Typical GitHub Actions jobs (main branch)",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "Zcp0T",
+              "name": "job1",
+              "fill": "#000000",
+              "content": "- ci: checkout, setup node/pnpm, cache, nx affected -t lint,test,build",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "axlBk",
+              "name": "job2",
+              "fill": "#000000",
+              "content": "- package: docker build for apps/web and apps/api",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "6V9jJ",
+              "name": "job3",
+              "fill": "#000000",
+              "content": "- publish: docker login + push to GHCR/ECR with immutable tag (commit SHA)",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "O2L8g",
+              "name": "job4",
+              "fill": "#000000",
+              "content": "- deploy: ssh/ssm to EC2, docker compose pull + up -d, run DB migration",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "E8T3E",
+              "name": "job5",
+              "fill": "#000000",
+              "content": "- verify: health endpoint check; if failed, roll back to previous stable tag",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "GgTcq",
+      "x": -194,
+      "y": 1254,
+      "name": "Frame 1",
+      "clip": true,
+      "width": 3614,
+      "height": 2658,
+      "fill": "#FFFFFF",
+      "layout": "none"
+    }
+  ]
+}
