@@ -129,7 +129,7 @@ jobs:
               "export API_IMAGE=${API_TAGGED_IMAGE}",
               "export CLIENT_IMAGE=${CLIENT_TAGGED_IMAGE}",
               "export NGINX_PORT=${NGINX_PORT}",
-              "if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; elif command -v docker-compose >/dev/null 2>&1; then COMPOSE='docker-compose'; else if command -v dnf >/dev/null 2>&1; then dnf install -y docker-compose-plugin; elif command -v yum >/dev/null 2>&1; then yum install -y docker-compose-plugin; fi; if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; elif command -v docker-compose >/dev/null 2>&1; then COMPOSE='docker-compose'; else echo 'Docker Compose is not available' >&2; exit 1; fi; fi",
+              "if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; elif command -v docker-compose >/dev/null 2>&1; then COMPOSE='docker-compose'; else ARCH=$(uname -m); case \"$ARCH\" in x86_64) BIN='x86_64' ;; aarch64|arm64) BIN='aarch64' ;; *) echo \"Unsupported arch: $ARCH\" >&2; exit 1 ;; esac; mkdir -p ~/.docker/cli-plugins; curl -fsSL \"https://github.com/docker/compose/releases/download/v2.33.1/docker-compose-linux-${BIN}\" -o ~/.docker/cli-plugins/docker-compose; chmod +x ~/.docker/cli-plugins/docker-compose; docker compose version >/dev/null 2>&1 || { echo 'Docker Compose install failed' >&2; exit 1; }; COMPOSE='docker compose'; fi",
               "\${COMPOSE} -f deploy/docker-compose.ec2.yml pull",
               "\${COMPOSE} -f deploy/docker-compose.ec2.yml up -d --remove-orphans",
               "docker image prune -f"
