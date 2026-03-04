@@ -130,8 +130,8 @@ jobs:
               "export CLIENT_IMAGE=${CLIENT_TAGGED_IMAGE}",
               "export NGINX_PORT=${NGINX_PORT}",
               "if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; elif command -v docker-compose >/dev/null 2>&1; then COMPOSE='docker-compose'; else if command -v dnf >/dev/null 2>&1; then dnf install -y docker-compose-plugin; elif command -v yum >/dev/null 2>&1; then yum install -y docker-compose-plugin; fi; if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; elif command -v docker-compose >/dev/null 2>&1; then COMPOSE='docker-compose'; else echo 'Docker Compose is not available' >&2; exit 1; fi; fi",
-              "${COMPOSE} -f deploy/docker-compose.ec2.yml pull",
-              "${COMPOSE} -f deploy/docker-compose.ec2.yml up -d --remove-orphans",
+              "\${COMPOSE} -f deploy/docker-compose.ec2.yml pull",
+              "\${COMPOSE} -f deploy/docker-compose.ec2.yml up -d --remove-orphans",
               "docker image prune -f"
             ]
           }
