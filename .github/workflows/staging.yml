@@ -129,8 +129,9 @@ jobs:
               "export API_IMAGE=${API_TAGGED_IMAGE}",
               "export CLIENT_IMAGE=${CLIENT_TAGGED_IMAGE}",
               "export NGINX_PORT=${NGINX_PORT}",
-              "docker compose -f deploy/docker-compose.ec2.yml pull",
-              "docker compose -f deploy/docker-compose.ec2.yml up -d --remove-orphans",
+              "if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; elif command -v docker-compose >/dev/null 2>&1; then COMPOSE='docker-compose'; else if command -v dnf >/dev/null 2>&1; then dnf install -y docker-compose-plugin; elif command -v yum >/dev/null 2>&1; then yum install -y docker-compose-plugin; fi; if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; elif command -v docker-compose >/dev/null 2>&1; then COMPOSE='docker-compose'; else echo 'Docker Compose is not available' >&2; exit 1; fi; fi",
+              "${COMPOSE} -f deploy/docker-compose.ec2.yml pull",
+              "${COMPOSE} -f deploy/docker-compose.ec2.yml up -d --remove-orphans",
               "docker image prune -f"
             ]
           }
@@ -148,16 +149,25 @@ jobs:
           )"
 
           echo "SSM CommandId=$command_id"
-          aws ssm wait command-executed --region "$AWS_REGION" --command-id "$command_id" --instance-id "$INSTANCE_ID"
+          status="Pending"
+          for _ in $(seq 1 120); do
+            status_raw="$(
+              aws ssm get-command-invocation \
+                --region "$AWS_REGION" \
+                --command-id "$command_id" \
+                --instance-id "$INSTANCE_ID" \
+                --query "Status" \
+                --output text 2>/dev/null || true
+            )"
+            status="${status_raw:-Pending}"
+            case "$status" in
+              Success|Failed|Cancelled|TimedOut|Undeliverable|Terminated|DeliveryTimedOut)
+                break
+                ;;
+            esac
+            sleep 2
+          done
 
-          status="$(
-            aws ssm get-command-invocation \
-              --region "$AWS_REGION" \
-              --command-id "$command_id" \
-              --instance-id "$INSTANCE_ID" \
-              --query "Status" \
-              --output text
-          )"
           echo "SSM Status=$status"
 
           aws ssm get-command-invocation \
