@@ -118,6 +118,19 @@ jobs:
           script: |
             set -euo pipefail
             cd "$APP_DIR"
+
+            # Keep deploy configs in sync with the staging branch.
+            # Images are built from the workflow's checkout, but compose/nginx config
+            # is read from the EC2 filesystem.
+            if [ -d .git ]; then
+              git fetch origin --tags
+              git checkout staging
+              git pull --ff-only origin staging
+            else
+              echo "ERROR: $APP_DIR is not a git repo. Clone the repo on EC2 first." >&2
+              exit 1
+            fi
+
             aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
 
             export API_IMAGE="$API_TAGGED_IMAGE"
