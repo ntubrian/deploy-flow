@@ -22,6 +22,7 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION }}
       ECR_API_REPOSITORY: ${{ vars.ECR_API_REPOSITORY }}
       ECR_CLIENT_REPOSITORY: ${{ vars.ECR_CLIENT_REPOSITORY }}
+      STAGING_INSTANCE_ID: ${{ vars.STAGING_INSTANCE_ID }}
       STAGING_APP_DIR: ${{ vars.STAGING_APP_DIR }}
       STAGING_NGINX_PORT: ${{ vars.STAGING_NGINX_PORT || '80' }}
     steps:
@@ -37,6 +38,7 @@ jobs:
           test -n "${AWS_REGION}"
           test -n "${ECR_API_REPOSITORY}"
           test -n "${ECR_CLIENT_REPOSITORY}"
+          test -n "${STAGING_INSTANCE_ID}"
           test -n "${STAGING_APP_DIR}"
 
       - name: Create staging tag
@@ -100,43 +102,76 @@ jobs:
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_CLIENT_REPOSITORY }}:${{ steps.tag.outputs.value }}
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_CLIENT_REPOSITORY }}:sha-${{ github.sha }}
 
-      - name: Deploy to staging EC2
-        uses: appleboy/ssh-action@v1.2.0
+      - name: Deploy to staging EC2 (SSM)
+        shell: bash
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           API_TAGGED_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_API_REPOSITORY }}:${{ steps.tag.outputs.value }}
           CLIENT_TAGGED_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_CLIENT_REPOSITORY }}:${{ steps.tag.outputs.value }}
           AWS_REGION: ${{ env.AWS_REGION }}
+          INSTANCE_ID: ${{ env.STAGING_INSTANCE_ID }}
           APP_DIR: ${{ env.STAGING_APP_DIR }}
           NGINX_PORT: ${{ env.STAGING_NGINX_PORT }}
-        with:
-          host: ${{ secrets.STAGING_EC2_HOST }}
-          username: ${{ secrets.STAGING_EC2_USER }}
-          key: ${{ secrets.STAGING_EC2_SSH_KEY }}
-          envs: REGISTRY,API_TAGGED_IMAGE,CLIENT_TAGGED_IMAGE,AWS_REGION,APP_DIR,NGINX_PORT
-          script_stop: true
-          script: |
-            set -euo pipefail
-            cd "$APP_DIR"
+          TAG: ${{ steps.tag.outputs.value }}
+        run: |
+          set -euo pipefail
+          aws --version
 
-            # Keep deploy configs in sync with the staging branch.
-            # Images are built from the workflow's checkout, but compose/nginx config
-            # is read from the EC2 filesystem.
-            if [ -d .git ]; then
-              git fetch origin --tags
-              git checkout staging
-              git pull --ff-only origin staging
-            else
-              echo "ERROR: $APP_DIR is not a git repo. Clone the repo on EC2 first." >&2
-              exit 1
-            fi
+          cat > /tmp/ssm-params.json <<EOF
+          {
+            "commands": [
+              "set -euo pipefail",
+              "cd ${APP_DIR}",
+              "sudo -u ec2-user git fetch origin --tags",
+              "sudo -u ec2-user git checkout staging",
+              "sudo -u ec2-user git pull --ff-only origin staging",
+              "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY}",
+              "export API_IMAGE=${API_TAGGED_IMAGE}",
+              "export CLIENT_IMAGE=${CLIENT_TAGGED_IMAGE}",
+              "export NGINX_PORT=${NGINX_PORT}",
+              "docker compose -f deploy/docker-compose.ec2.yml pull",
+              "docker compose -f deploy/docker-compose.ec2.yml up -d --remove-orphans",
+              "docker image prune -f"
+            ]
+          }
+          EOF
 
-            aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
+          command_id="$(
+            aws ssm send-command \
+              --region "$AWS_REGION" \
+              --document-name "AWS-RunShellScript" \
+              --instance-ids "$INSTANCE_ID" \
+              --comment "deploy-flow staging ${TAG}" \
+              --parameters file:///tmp/ssm-params.json \
+              --query "Command.CommandId" \
+              --output text
+          )"
 
-            export API_IMAGE="$API_TAGGED_IMAGE"
-            export CLIENT_IMAGE="$CLIENT_TAGGED_IMAGE"
-            export NGINX_PORT="$NGINX_PORT"
+          echo "SSM CommandId=$command_id"
+          aws ssm wait command-executed --region "$AWS_REGION" --command-id "$command_id" --instance-id "$INSTANCE_ID"
 
-            docker compose -f deploy/docker-compose.ec2.yml pull
-            docker compose -f deploy/docker-compose.ec2.yml up -d --remove-orphans
-            docker image prune -f
+          status="$(
+            aws ssm get-command-invocation \
+              --region "$AWS_REGION" \
+              --command-id "$command_id" \
+              --instance-id "$INSTANCE_ID" \
+              --query "Status" \
+              --output text
+          )"
+          echo "SSM Status=$status"
+
+          aws ssm get-command-invocation \
+            --region "$AWS_REGION" \
+            --command-id "$command_id" \
+            --instance-id "$INSTANCE_ID" \
+            --query "StandardOutputContent" \
+            --output text
+
+          aws ssm get-command-invocation \
+            --region "$AWS_REGION" \
+            --command-id "$command_id" \
+            --instance-id "$INSTANCE_ID" \
+            --query "StandardErrorContent" \
+            --output text >&2 || true
+
+          test "$status" = "Success"
