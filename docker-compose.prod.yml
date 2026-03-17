@@ -10,6 +10,8 @@ services:
       AWS_REGION: ${AWS_REGION}
       AWS_SSM_PARAMETER_PREFIX: ${AWS_SSM_PARAMETER_PREFIX:-/deploy-flow}
       DB_SSL_ROOT_CERT_PATH: ${DB_SSL_ROOT_CERT_PATH:-}
+    volumes:
+      - ./deploy/certs/rds:/run/certs/rds:ro
     restart: unless-stopped
 
   client:
