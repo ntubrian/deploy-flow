@@ -1,105 +1,297 @@
-# New Nx Repository
+# deploy-flow
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+## 專案範圍
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+目前只實作 `fig.pen` 已定義的 donation catalog 列表流程：
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-## Try the full Nx platform
-🚀 If you haven't connected to Nx Cloud yet, [complete your setup here](https://cloud.nx.app/setup/connect-workspace/guide). Get faster builds with remote caching, distributed task execution, and self-healing CI. [See how your workspace can benefit](#nx-cloud).
-## Generate a library
+- 公益團體列表
+- 捐款專案列表
+- 義賣商品列表
+- 搜尋
+- 類別篩選 modal
+- infinite scroll / 分頁
+- 搜尋中 / 無結果狀態
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+目前不做：
+
+- 卡片點擊後 detail page
+- 捐款流程
+- 商品購物車 / 結帳
+- 後台
+
+## Web 基本驗證策略
+
+- 這一層是 `shared secret access gate`，用途是保護 web preview / internal access，不是正式會員登入系統
+- 前端不保存原始 secret key 到 `localStorage`、`sessionStorage` 或一般可被 JavaScript 讀取的 cookie
+- 首次進站時，前端先呼叫 `GET /api/auth/session`
+- 若 API 回 `401`，前端顯示 key 輸入流程；MVP 可先用原生 prompt，後續可換成自製 modal
+- 使用者輸入 key 後，前端呼叫 `POST /api/auth/access-key`
+- API 驗證成功後，回傳 `HttpOnly + Secure + SameSite=Strict` 的 session cookie
+- 後續 API / GraphQL request 一律使用 cookie session，前端 request 預設帶 `credentials: 'include'`
+- API 層使用全域 guard 驗證 cookie，白名單只保留 `auth/access-key`、`auth/session`、`health`
+- session cookie 存的是驗證後的 session，不是原始 shared secret
+- EC2 部署時，shared secret 與 cookie signing secret 預設存放在 AWS Systems Manager Parameter Store `SecureString`
+- 若未來需要自動 rotation、跨區域 replication 或更完整的 secret lifecycle，再升級為 AWS Secrets Manager
+- EC2 instance 透過 IAM role / instance profile 讀取 secret，應用程式啟動時載入到記憶體中使用，不在每個 request 重抓
+- 需要額外補強 rate limit、失敗登入紀錄、session 過期時間與 key rotation 機制
+
+## 進度維護規則
+
+- 未完成：`- [ ] 任務名稱`
+- 完成後再改成：`- [x] 任務名稱（YYYY-MM-DD）`
+- 先不要預先打勾；確認完成後再逐項補日期
+
+## 前端進度
+
+### 基本驗證
+
+- [ ] 建立首次進站 `auth/session` 檢查流程
+- [ ] 建立 shared secret 輸入 UI
+- [ ] 建立驗證失敗時重試輸入流程
+- [ ] 建立驗證成功後重試資料載入流程
+- [ ] 設定前端 API client 預設帶 `credentials: 'include'`
+- [ ] 建立未驗證前阻擋 catalog query 的規則
+- [ ] 建立驗證失敗提示文案
+
+### 頁面骨架
+
+- [ ] 建立 donation catalog 頁面路由
+- [ ] 建立頁面外層 layout
+- [ ] 建立頁首標題區塊
+- [ ] 建立三個 tab 切換區塊
+- [ ] 建立 tab active state 樣式
+- [ ] 建立 tab 切換事件與狀態管理
+
+### 搜尋與篩選 UI
+
+- [ ] 建立搜尋輸入框元件
+- [ ] 建立搜尋 icon 按鈕
+- [ ] 建立搜尋 placeholder 文案
+- [ ] 建立搜尋輸入狀態
+- [ ] 建立搜尋 debounce
+- [ ] 建立搜尋清空行為
+- [ ] 建立搜尋送出後重置分頁行為
+- [ ] 建立類別篩選 trigger
+- [ ] 建立所有類別 modal 容器
+- [ ] 建立 modal header
+- [ ] 建立 modal 關閉按鈕
+- [ ] 建立類別 chip/button 元件
+- [ ] 建立類別選取 active state
+- [ ] 建立類別切換後重置分頁行為
+- [ ] 建立 modal 關閉後保留目前篩選狀態
+
+### 公益團體列表
+
+- [ ] 建立公益團體卡元件
+- [ ] 顯示團體 logo
+- [ ] 顯示團體名稱
+- [ ] 顯示團體簡介
+- [ ] 建立公益團體列表容器
+- [ ] 串接公益團體 query
+- [ ] 套用公益團體 keyword 搜尋
+- [ ] 套用公益團體 category 篩選
+- [ ] 套用公益團體 infinite scroll
+
+### 捐款專案列表
+
+- [ ] 建立捐款專案卡元件
+- [ ] 顯示專案封面圖
+- [ ] 顯示所屬團體名稱
+- [ ] 顯示專案標題
+- [ ] 顯示專案類別 tags
+- [ ] 建立捐款專案列表容器
+- [ ] 串接捐款專案 query
+- [ ] 套用捐款專案 keyword 搜尋
+- [ ] 套用捐款專案 category 篩選
+- [ ] 套用捐款專案 infinite scroll
+
+### 義賣商品列表
+
+- [ ] 建立義賣商品卡元件
+- [ ] 顯示商品封面圖
+- [ ] 顯示所屬團體名稱
+- [ ] 顯示商品名稱
+- [ ] 顯示商品價格
+- [ ] 建立義賣商品列表容器
+- [ ] 串接義賣商品 query
+- [ ] 套用義賣商品 keyword 搜尋
+- [ ] 套用義賣商品 category 篩選
+- [ ] 套用義賣商品 infinite scroll
+
+### 共用狀態處理
+
+- [ ] 建立搜尋中 loading UI
+- [ ] 建立列表初次載入 loading UI
+- [ ] 建立載入更多 loading UI
+- [ ] 建立搜尋無結果 UI
+- [ ] 建立 API error UI
+- [ ] 建立 tab 切換時的資料重置規則
+- [ ] 建立 keyword 與 category 同步查詢規則
+
+### 前端測試
+
+- [ ] 測首次進站未通過驗證會先進入 key 驗證流程
+- [ ] 測驗證成功後可正常載入 catalog
+- [ ] 測驗證失敗時不會載入 catalog
+- [ ] 測 tab 切換顯示正確列表
+- [ ] 測搜尋輸入會觸發正確 query 參數
+- [ ] 測類別 modal 開關行為
+- [ ] 測類別選取 active state
+- [ ] 測切換類別後列表重置
+- [ ] 測 infinite scroll 追加資料
+- [ ] 測無結果畫面
+- [ ] 測 API error 畫面
+
+## 後端進度
+
+### 基礎建設
+
+- [ ] 安裝 `@nestjs/graphql`
+- [ ] 安裝 `@nestjs/apollo`
+- [ ] 安裝 `@nestjs/typeorm`
+- [ ] 安裝 TypeORM database driver
+- [ ] 建立 GraphQL module 設定
+- [ ] 建立 TypeORM module 設定
+- [ ] 建立環境變數設定檔
+- [ ] 定義開發用 database 連線策略
+
+### 基本驗證 / Security
+
+- [ ] 建立 `POST /api/auth/access-key`
+- [ ] 建立 `GET /api/auth/session`
+- [ ] 建立 shared secret 驗證 service
+- [ ] 建立 session cookie 簽發邏輯
+- [ ] 建立 session 驗證邏輯
+- [ ] 建立全域 auth guard
+- [ ] 設定 auth whitelist
+- [ ] 加入 cookie parser
+- [ ] 設定 CORS credentials 策略
+- [ ] 定義 `WEB_GATE_SHARED_SECRET` env schema
+- [ ] 定義 `WEB_GATE_SESSION_SECRET` env schema
+- [ ] 定義 cookie expiration 設定
+- [ ] 加入 auth rate limiting
+- [ ] 定義 EC2 啟動時讀取 secret 的策略
+- [ ] 定義 Parameter Store / Secrets Manager secret 路徑命名
+
+### 資料表 / Entity
+
+- [ ] 建立 `AssetEntity`
+- [ ] 建立 `CategoryEntity`
+- [ ] 建立 `OrganizationEntity`
+- [ ] 建立 `DonationProjectEntity`
+- [ ] 建立 `SaleProductEntity`
+- [ ] 建立 `OrganizationCategoryEntity`
+- [ ] 建立 `ProjectCategoryEntity`
+- [ ] 建立 `ProductCategoryEntity`
+- [ ] 設定 organization -> logo relation
+- [ ] 設定 organization -> categories relation
+- [ ] 設定 donation project -> organization relation
+- [ ] 設定 donation project -> categories relation
+- [ ] 設定 donation project -> cover relation
+- [ ] 設定 sale product -> organization relation
+- [ ] 設定 sale product -> categories relation
+- [ ] 設定 sale product -> cover relation
+
+### Migration / Seed
+
+- [ ] 建立初始 migration
+- [ ] 建立 categories seed
+- [ ] 建立 organizations seed
+- [ ] 建立 donation projects seed
+- [ ] 建立 sale products seed
+- [ ] 建立 asset seed
+- [ ] 建立 organization_categories seed
+- [ ] 建立 project_categories seed
+- [ ] 建立 product_categories seed
+- [ ] 建立 seed 執行指令
+- [ ] 驗證 seed 後三個 tab 都有資料
+
+### Repository Pattern
+
+- [ ] 建立 `OrganizationRepository` interface
+- [ ] 建立 `DonationProjectRepository` interface
+- [ ] 建立 `SaleProductRepository` interface
+- [ ] 建立 `CategoryRepository` interface
+- [ ] 建立 `OrganizationListRepository` interface
+- [ ] 建立 `DonationProjectListRepository` interface
+- [ ] 建立 `SaleProductListRepository` interface
+- [ ] 建立 TypeORM `OrganizationRepository` implementation
+- [ ] 建立 TypeORM `DonationProjectRepository` implementation
+- [ ] 建立 TypeORM `SaleProductRepository` implementation
+- [ ] 建立 TypeORM `CategoryRepository` implementation
+- [ ] 建立 TypeORM `OrganizationListRepository` implementation
+- [ ] 建立 TypeORM `DonationProjectListRepository` implementation
+- [ ] 建立 TypeORM `SaleProductListRepository` implementation
+
+### Query 邏輯
+
+- 所有列表 pagination 一律採用 cursor-based pagination strategy
+
+- [ ] 實作公益團體 keyword 搜尋
+- [ ] 實作公益團體 category 篩選
+- [ ] 實作公益團體 cursor pagination
+- [ ] 實作捐款專案 keyword 搜尋
+- [ ] 實作捐款專案 category 篩選
+- [ ] 實作捐款專案 cursor pagination
+- [ ] 實作捐款專案 tags 載入
+- [ ] 實作義賣商品 keyword 搜尋
+- [ ] 實作義賣商品 category 篩選
+- [ ] 實作義賣商品 cursor pagination
+- [ ] 實作義賣商品 categories 載入
+- [ ] 實作義賣商品 price 欄位返回
+- [ ] 實作 categories 排序查詢
+
+### GraphQL Schema / Resolver
+
+- [ ] 建立 `Asset` GraphQL type
+- [ ] 建立 `Category` GraphQL type
+- [ ] 建立 `Organization` GraphQL type
+- [ ] 建立 `DonationProject` GraphQL type
+- [ ] 建立 `SaleProduct` GraphQL type
+- [ ] 建立 `PageInfo` GraphQL type
+- [ ] 建立 `OrganizationConnection` type
+- [ ] 建立 `DonationProjectConnection` type
+- [ ] 建立 `SaleProductConnection` type
+- [ ] 建立 `OrganizationListInput`
+- [ ] 建立 `DonationProjectListInput`
+- [ ] 建立 `SaleProductListInput`
+- [ ] 建立 `PageInput`
+- [ ] 建立 `OrganizationResolver`
+- [ ] 建立 `DonationProjectResolver`
+- [ ] 建立 `SaleProductResolver`
+- [ ] 建立 `CategoryResolver`
+
+### 後端測試
+
+- [ ] 測 `POST /api/auth/access-key` 驗證成功
+- [ ] 測 `POST /api/auth/access-key` 驗證失敗
+- [ ] 測 `GET /api/auth/session` 未登入回 401
+- [ ] 測 `GET /api/auth/session` 已登入回成功
+- [ ] 測全域 auth guard 會擋住未授權 request
+- [ ] 測過期 session cookie 會被拒絕
+- [ ] 測 `OrganizationListRepository` keyword filter
+- [ ] 測 `OrganizationListRepository` category filter
+- [ ] 測 `OrganizationListRepository` cursor pagination
+- [ ] 測 `DonationProjectListRepository` keyword filter
+- [ ] 測 `DonationProjectListRepository` category filter
+- [ ] 測 `DonationProjectListRepository` tags mapping
+- [ ] 測 `DonationProjectListRepository` cursor pagination
+- [ ] 測 `SaleProductListRepository` keyword filter
+- [ ] 測 `SaleProductListRepository` category filter
+- [ ] 測 `SaleProductListRepository` categories mapping
+- [ ] 測 `SaleProductListRepository` price mapping
+- [ ] 測 `SaleProductListRepository` cursor pagination
+- [ ] 測 `CategoryResolver` 回傳排序正確
+- [ ] 測 `OrganizationResolver` input / output
+- [ ] 測 `DonationProjectResolver` input / output
+- [ ] 測 `SaleProductResolver` input / output
+- [ ] 測 seed 後 query 可正常回資料
+
+## Nx 常用指令
+
+```bash
+pnpm nx show projects
+pnpm nx test @deploy-flow/api
+pnpm nx test @deploy-flow/client
+pnpm nx test @deploy-flow/api-e2e
 ```
-
-## Run tasks
-
-To build the library use:
-
-```sh
-npx nx build pkg1
-```
-
-To run any task with Nx use:
-
-```sh
-npx nx <target> <project-name>
-```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Versioning and releasing
-
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
-```
-
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
-
-```sh
-npx nx sync:check
-```
-
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
-
-## Nx Cloud
-
-Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Set up CI (non-Github Actions CI)
-
-**Note:** This is only required if your CI provider is not GitHub Actions.
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
