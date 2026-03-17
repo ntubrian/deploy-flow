@@ -9,6 +9,7 @@ services:
       APP_STAGE: ${APP_STAGE:-production}
       AWS_REGION: ${AWS_REGION}
       AWS_SSM_PARAMETER_PREFIX: ${AWS_SSM_PARAMETER_PREFIX:-/deploy-flow}
+      DB_SSL_ROOT_CERT_PATH: ${DB_SSL_ROOT_CERT_PATH:-}
     restart: unless-stopped
 
   client:

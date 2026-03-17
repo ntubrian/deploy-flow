@@ -30,6 +30,7 @@ export interface DatabaseConfig {
   password: string;
   port: number;
   ssl: boolean;
+  sslRootCertPath?: string;
   synchronize: false;
   username: string;
 }
@@ -61,6 +62,7 @@ interface BaseEnvironment {
   };
   corsOrigins: string[];
   databaseLogging: boolean;
+  databaseSslRootCertPath?: string;
   graphqlPath: string;
   localDatabase: Omit<DatabaseConfig, 'logging' | 'synchronize'>;
   localWebGate: {
@@ -207,6 +209,7 @@ function parseBaseEnvironment(rawEnv: NodeJS.ProcessEnv): BaseEnvironment {
     },
     corsOrigins: parseList(rawEnv, 'APP_CORS_ORIGINS', ['http://localhost:4200']),
     databaseLogging: parseBoolean(rawEnv.DB_LOGGING, false),
+    databaseSslRootCertPath: parseOptionalString(rawEnv, 'DB_SSL_ROOT_CERT_PATH'),
     graphqlPath: parseString(rawEnv, 'GRAPHQL_PATH', 'graphql'),
     localDatabase: {
       host: parseString(rawEnv, 'DB_HOST', '127.0.0.1'),
@@ -319,6 +322,7 @@ export async function loadDatabaseConfig(
       return {
         ...baseEnvironment.localDatabase,
         logging: baseEnvironment.databaseLogging,
+        sslRootCertPath: baseEnvironment.databaseSslRootCertPath,
         synchronize: false as const,
       };
     }
@@ -366,6 +370,7 @@ export async function loadDatabaseConfig(
       password: ssmParameters[databasePasswordPath],
       port: parseIntegerValue(ssmParameters[databasePortPath], databasePortPath),
       ssl: parseBoolean(ssmParameters[databaseSslPath], false),
+      sslRootCertPath: baseEnvironment.databaseSslRootCertPath,
       synchronize: false as const,
       username: ssmParameters[databaseUsernamePath],
     };

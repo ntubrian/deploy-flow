@@ -2,17 +2,8 @@ import { join } from 'node:path';
 import { DataSourceOptions } from 'typeorm';
 
 import { catalogEntities } from './entities';
+import { resolveSslOptions } from './ssl-options';
 import { DatabaseConfig } from '../config/app-env';
-
-function resolveSslOptions(databaseConfig: DatabaseConfig) {
-  if (!databaseConfig.ssl) {
-    return false;
-  }
-
-  return {
-    rejectUnauthorized: false,
-  };
-}
 
 export function buildTypeOrmOptions(
   databaseConfig: DatabaseConfig

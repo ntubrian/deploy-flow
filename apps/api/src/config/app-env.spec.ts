@@ -45,6 +45,7 @@ describe('app-env', () => {
       password: 'postgres',
       port: 5433,
       ssl: false,
+      sslRootCertPath: undefined,
       synchronize: false,
       username: 'postgres',
     });
@@ -112,6 +113,7 @@ describe('app-env', () => {
       password: 'password-from-ssm',
       port: 5432,
       ssl: true,
+      sslRootCertPath: undefined,
       synchronize: false,
       username: 'deploy_flow_user',
     });

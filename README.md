@@ -41,6 +41,7 @@
 - `APP_STAGE=local` 時，web gate secrets 也從 local `.env` 讀取，不依賴 AWS SSM
 - `APP_STAGE=staging` 或 `APP_STAGE=production` 時，database connection 與 web gate secrets 都從 AWS Systems Manager Parameter Store 讀取
 - 本機開發只有在你主動驗證 non-local stage 設定時，才需要 AWS CLI / AWS SSO 登入與對應 parameter path / KMS decrypt 權限
+- 若目標 PostgreSQL 需要自訂 CA 憑證，使用一般 env `DB_SSL_ROOT_CERT_PATH` 指向憑證檔案路徑；此值不放 SSM
 - 建議 Parameter Store 命名規則為：
 - `/<service>/<stage>/api/database/host`
 - `/<service>/<stage>/api/database/port`
@@ -78,6 +79,8 @@
 - staging Swagger UI 路徑固定為 `https://stg.bin-hq.com/api/docs/`
 - staging OpenAPI JSON 路徑固定為 `https://stg.bin-hq.com/api/openapi.json`
 - staging deploy 時，GitHub Actions 會把 `APP_STAGE=staging` 與 `AWS_SSM_PARAMETER_PREFIX` 傳給 EC2 上的 compose stack
+- 若 staging RDS 需要 CA bundle，可先在 EC2 放好憑證檔，再設定 GitHub Actions environment variable `STAGING_DB_SSL_ROOT_CERT_PATH`
+- `ap-southeast-2` 的 RDS CA bundle 可從 `https://truststore.pki.rds.amazonaws.com/ap-southeast-2/ap-southeast-2-bundle.pem` 下載
 - staging demo seed 不建議在每次 deploy 自動執行；應保留為手動 job 或另開管理指令
 
 ## 進度維護規則
