@@ -75,6 +75,41 @@
           }
         }
       },
+      "dev-db-up": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "docker compose -f ../../docker-compose.dev.yml up -d postgres",
+          "cwd": "apps/api"
+        }
+      },
+      "dev-db-down": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "docker compose -f ../../docker-compose.dev.yml down",
+          "cwd": "apps/api"
+        }
+      },
+      "db-migration-run": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "pnpm exec ts-node --project ./tsconfig.app.json -r tsconfig-paths/register ./src/database/run-migrations.ts",
+          "cwd": "apps/api"
+        }
+      },
+      "db-migration-revert": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "pnpm exec ts-node --project ./tsconfig.app.json -r tsconfig-paths/register ./src/database/revert-last-migration.ts",
+          "cwd": "apps/api"
+        }
+      },
+      "db-seed-run": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "pnpm exec ts-node --project ./tsconfig.app.json -r tsconfig-paths/register ./src/database/run-seeds.ts",
+          "cwd": "apps/api"
+        }
+      },
       "test": {
         "options": {
           "passWithNoTests": true
@@ -83,14 +118,24 @@
     }
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.0",
-    "@nestjs/core": "^11.0.0",
-    "@nestjs/platform-express": "^11.0.0",
+    "@apollo/server": "^5.4.0",
+    "@as-integrations/express5": "^1.1.2",
+    "@aws-sdk/client-ssm": "^3.1010.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "graphql": "^16.13.1",
+    "pg": "^8.20.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.0",
-    "tslib": "^2.3.0"
+    "swagger-ui-express": "^5.0.1",
+    "tslib": "^2.3.0",
+    "typeorm": "^0.3.28"
   },
   "devDependencies": {
-    "@nestjs/testing": "^11.0.0"
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/swagger-ui-express": "^4.1.8",
+    "supertest": "^7.2.2",
+    "tsconfig-paths": "^4.2.0"
   }
 }

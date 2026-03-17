@@ -52,3 +52,9 @@ vite.config.*.timestamp*
 # keys / secrets
 *.pem
 deploy/certs/
+.env
+.env.*
+!.env.example
+apps/**/.env
+apps/**/.env.*
+!apps/**/.env.example

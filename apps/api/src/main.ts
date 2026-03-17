@@ -1,21 +1,32 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
+import 'reflect-metadata';
 
-import { Logger } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/app.module';
+import { createServer, Server } from 'node:http';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'api';
-  app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
-  Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+import { loadAppEnvironment } from './config/app-env';
+import { createAppDataSource } from './database/typeorm.datasource';
+import { createApp } from './server/create-app';
+
+async function bootstrap(): Promise<Server> {
+  const appEnvironment = await loadAppEnvironment();
+  const dataSource = createAppDataSource(appEnvironment.database);
+
+  await dataSource.initialize();
+
+  const { app } = await createApp(appEnvironment, dataSource);
+  const server = createServer(app);
+
+  await new Promise<void>((resolve) => {
+    server.listen(appEnvironment.port, resolve);
+  });
+
+  console.log(
+    `API server listening at http://localhost:${appEnvironment.port}/${appEnvironment.apiPrefix}`
   );
+
+  return server;
 }
 
-bootstrap();
+void bootstrap().catch((error: unknown) => {
+  console.error('Failed to bootstrap API server', error);
+  process.exitCode = 1;
+});

@@ -35,6 +35,51 @@
 - EC2 instance 透過 IAM role / instance profile 讀取 secret，應用程式啟動時載入到記憶體中使用，不在每個 request 重抓
 - 需要額外補強 rate limit、失敗登入紀錄、session 過期時間與 key rotation 機制
 
+## 後端設定來源策略
+
+- `APP_STAGE=local` 時，database 預設連到本機 Docker PostgreSQL，可用 `.env` 覆寫 host / port / db name / username / password / ssl
+- `APP_STAGE=local` 時，web gate secrets 也從 local `.env` 讀取，不依賴 AWS SSM
+- `APP_STAGE=staging` 或 `APP_STAGE=production` 時，database connection 與 web gate secrets 都從 AWS Systems Manager Parameter Store 讀取
+- 本機開發只有在你主動驗證 non-local stage 設定時，才需要 AWS CLI / AWS SSO 登入與對應 parameter path / KMS decrypt 權限
+- 建議 Parameter Store 命名規則為：
+- `/<service>/<stage>/api/database/host`
+- `/<service>/<stage>/api/database/port`
+- `/<service>/<stage>/api/database/name`
+- `/<service>/<stage>/api/database/username`
+- `/<service>/<stage>/api/database/password`
+- `/<service>/<stage>/api/database/ssl`
+- `/<service>/<stage>/api/web-gate/shared-secret`
+- `/<service>/<stage>/api/web-gate/session-secret`
+
+## Migration 策略
+
+- local / dev 的 migration 可由開發者手動執行，用來驗證本機 Docker PostgreSQL schema
+- staging migration 應在 CI / deploy workflow 內執行，不建議由開發者從本機手動連 staging database 執行
+- production migration 也應走 deploy workflow，並在 release 過程中確保同一時間只會有一個 migration job 執行
+- deploy workflow 內的 migration job 應使用與應用程式相同的 SSM 參數來源與 IAM 權限
+- rollback 不應預設自動執行；若 migration 失敗，先停止 release，再依 migration 內容決定人工 rollback 策略
+
+## Local API 開發流程
+
+- 啟動本機 PostgreSQL：`pnpm nx run @deploy-flow/api:dev-db-up`
+- 執行 migration：`pnpm nx run @deploy-flow/api:db-migration-run`
+- 寫入 demo seed：`pnpm nx run @deploy-flow/api:db-seed-run`
+- 啟動 API：`pnpm nx serve @deploy-flow/api`
+- local Docker PostgreSQL host port：`5433`
+- local 預設不需要 AWS 登入；只要 `.env` 內的 DB 與 `WEB_GATE_*` 設定齊全即可
+- local GraphQL Sandbox：`http://localhost:3000/api/graphql`
+- local Swagger UI：`http://localhost:3000/api/docs/`
+- local OpenAPI JSON：`http://localhost:3000/api/openapi.json`
+- 若要關閉本機 PostgreSQL：`pnpm nx run @deploy-flow/api:dev-db-down`
+
+## Staging API 操作規則
+
+- staging GraphQL Sandbox 路徑固定為 `https://stg.bin-hq.com/api/graphql`
+- staging Swagger UI 路徑固定為 `https://stg.bin-hq.com/api/docs/`
+- staging OpenAPI JSON 路徑固定為 `https://stg.bin-hq.com/api/openapi.json`
+- staging deploy 時，GitHub Actions 會把 `APP_STAGE=staging` 與 `AWS_SSM_PARAMETER_PREFIX` 傳給 EC2 上的 compose stack
+- staging demo seed 不建議在每次 deploy 自動執行；應保留為手動 job 或另開管理指令
+
 ## 進度維護規則
 
 - 未完成：`- [ ] 任務名稱`
@@ -146,14 +191,18 @@
 
 ### 基礎建設
 
-- [ ] 安裝 `@nestjs/graphql`
-- [ ] 安裝 `@nestjs/apollo`
-- [ ] 安裝 `@nestjs/typeorm`
+- database schema 變更一律走 migration，不使用 TypeORM auto sync / `synchronize: true`
+
+- [ ] 安裝 `express`
+- [ ] 安裝 `@apollo/server`
+- [ ] 安裝 `@as-integrations/express5`
 - [ ] 安裝 TypeORM database driver
-- [ ] 建立 GraphQL module 設定
-- [ ] 建立 TypeORM module 設定
+- [ ] 建立 Express app bootstrap
+- [ ] 建立 Apollo GraphQL middleware 設定
+- [ ] 建立 TypeORM `DataSource` 設定
+- [ ] 確認所有環境關閉 TypeORM auto sync
 - [ ] 建立環境變數設定檔
-- [ ] 定義開發用 database 連線策略
+- [ ] 定義 `local full env + non-local full SSM` 設定策略
 
 ### 基本驗證 / Security
 
@@ -162,12 +211,12 @@
 - [ ] 建立 shared secret 驗證 service
 - [ ] 建立 session cookie 簽發邏輯
 - [ ] 建立 session 驗證邏輯
-- [ ] 建立全域 auth guard
+- [ ] 建立全域 auth middleware
 - [ ] 設定 auth whitelist
 - [ ] 加入 cookie parser
 - [ ] 設定 CORS credentials 策略
-- [ ] 定義 `WEB_GATE_SHARED_SECRET` env schema
-- [ ] 定義 `WEB_GATE_SESSION_SECRET` env schema
+- [ ] 定義 SSM shared secret 載入策略
+- [ ] 定義 SSM session secret 載入策略
 - [ ] 定義 cookie expiration 設定
 - [ ] 加入 auth rate limiting
 - [ ] 定義 EC2 啟動時讀取 secret 的策略
@@ -195,6 +244,8 @@
 ### Migration / Seed
 
 - [ ] 建立初始 migration
+- [ ] 建立 migration 執行指令
+- [ ] 建立 migration rollback 指令
 - [ ] 建立 categories seed
 - [ ] 建立 organizations seed
 - [ ] 建立 donation projects seed
