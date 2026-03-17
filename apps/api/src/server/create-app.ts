@@ -9,22 +9,40 @@ import * as swaggerUi from 'swagger-ui-express';
 import { DataSource } from 'typeorm';
 
 import { BoundedMemoryCache } from './bounded-memory-cache';
-import { resolvers, typeDefs } from './graphql';
+import { type GraphqlContext } from './graphql-context';
 import { buildOpenApiDocument } from './openapi';
 import { type AppEnvironment } from '../config/app-env';
+import { getGraphqlSchema } from '../graphql/schema';
 
 export interface ApiApp {
   apolloServer: ApolloServer;
   app: Express;
 }
 
+export interface CreateAppOptions {
+  createGraphqlContext?: (
+    appEnvironment: AppEnvironment,
+    dataSource: DataSource
+  ) => GraphqlContext | Promise<GraphqlContext>;
+}
+
 function shouldEnableDeveloperInterfaces(appEnvironment: AppEnvironment): boolean {
   return appEnvironment.appStage === 'local' || appEnvironment.appStage === 'staging';
 }
 
-export async function createApp(
+async function createDefaultGraphqlContext(
   appEnvironment: AppEnvironment,
   dataSource: DataSource
+): Promise<GraphqlContext> {
+  const { createGraphqlContext } = await import('./graphql-context');
+
+  return createGraphqlContext(appEnvironment, dataSource);
+}
+
+export async function createApp(
+  appEnvironment: AppEnvironment,
+  dataSource: DataSource,
+  options: CreateAppOptions = {}
 ): Promise<ApiApp> {
   const developerInterfacesEnabled =
     shouldEnableDeveloperInterfaces(appEnvironment);
@@ -55,8 +73,7 @@ export async function createApp(
     documentStore,
     introspection: developerInterfacesEnabled,
     plugins: apolloPlugins,
-    resolvers,
-    typeDefs,
+    schema: getGraphqlSchema(),
   });
 
   await apolloServer.start();
@@ -104,10 +121,11 @@ export async function createApp(
   app.use(
     `/${appEnvironment.apiPrefix}/${appEnvironment.graphqlPath}`,
     expressMiddleware(apolloServer, {
-      context: async () => ({
-        appEnvironment,
-        dataSource,
-      }),
+      context: async () =>
+        (options.createGraphqlContext ?? createDefaultGraphqlContext)(
+          appEnvironment,
+          dataSource
+        ),
     })
   );
 

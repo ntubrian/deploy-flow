@@ -1,0 +1,130 @@
+type Query {
+  """Lists all supported catalog categories in display order."""
+  categories: [Category!]!
+
+  """Lists donation projects using cursor-based pagination."""
+  donationProjects(
+    """Return records after this cursor."""
+    after: String
+
+    """Category id filter. Omit or pass null to include all records."""
+    categoryId: ID
+
+    """Maximum number of records to return. Defaults to 12 and caps at 50."""
+    first: Int
+
+    """Keyword filter applied to title and organization-related text."""
+    keyword: String
+  ): DonationProjectConnection!
+
+  """Lightweight health check for runtime diagnostics."""
+  health: String!
+
+  """Lists organizations using cursor-based pagination."""
+  organizations(
+    """Return records after this cursor."""
+    after: String
+
+    """Category id filter. Omit or pass null to include all records."""
+    categoryId: ID
+
+    """Maximum number of records to return. Defaults to 12 and caps at 50."""
+    first: Int
+
+    """Keyword filter applied to title and organization-related text."""
+    keyword: String
+  ): OrganizationConnection!
+
+  """Lists sale products using cursor-based pagination."""
+  saleProducts(
+    """Return records after this cursor."""
+    after: String
+
+    """Category id filter. Omit or pass null to include all records."""
+    categoryId: ID
+
+    """Maximum number of records to return. Defaults to 12 and caps at 50."""
+    first: Int
+
+    """Keyword filter applied to title and organization-related text."""
+    keyword: String
+  ): SaleProductConnection!
+}
+
+type Category {
+  id: ID!
+  name: String!
+  sortOrder: Int!
+}
+
+type DonationProjectConnection {
+  edges: [DonationProjectEdge!]!
+  pageInfo: PageInfo!
+}
+
+type DonationProjectEdge {
+  cursor: String!
+  node: DonationProject!
+}
+
+type DonationProject {
+  id: ID!
+  title: String!
+  categories: [Category!]!
+  cover: Asset!
+  organization: Organization!
+}
+
+type Asset {
+  id: ID!
+  altText: String!
+  url: String!
+}
+
+type Organization {
+  id: ID!
+  name: String!
+  summary: String!
+  categories: [Category!]!
+  logo: Asset!
+}
+
+"""Shared metadata for cursor-based catalog lists."""
+type PageInfo {
+  """
+  Cursor for the final edge in this page. Use it as the next `after` value.
+  """
+  endCursor: String
+
+  """Indicates whether another page exists after the current page."""
+  hasNextPage: Boolean!
+}
+
+type OrganizationConnection {
+  edges: [OrganizationEdge!]!
+  pageInfo: PageInfo!
+}
+
+type OrganizationEdge {
+  cursor: String!
+  node: Organization!
+}
+
+type SaleProductConnection {
+  edges: [SaleProductEdge!]!
+  pageInfo: PageInfo!
+}
+
+type SaleProductEdge {
+  cursor: String!
+  node: SaleProduct!
+}
+
+type SaleProduct {
+  id: ID!
+  title: String!
+  priceAmount: String!
+  categories: [Category!]!
+  cover: Asset!
+  organization: Organization!
+}

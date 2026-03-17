@@ -2,6 +2,7 @@ import request from 'supertest';
 import { DataSource } from 'typeorm';
 
 import { createApp } from './create-app';
+import { GraphqlContext } from './graphql-context';
 import { AppEnvironment } from '../config/app-env';
 
 describe('createApp', () => {
@@ -36,9 +37,67 @@ describe('createApp', () => {
   let app: Awaited<ReturnType<typeof createApp>>['app'];
 
   async function setup(appEnvironment: AppEnvironment) {
+    const graphqlContext = {
+      appEnvironment,
+      dataSource: {
+        isInitialized: true,
+      } as DataSource,
+      loaders: {
+        assetById: {
+          load: jest.fn(),
+        },
+        categoriesByDonationProjectId: {
+          load: jest.fn(),
+        },
+        categoriesByOrganizationId: {
+          load: jest.fn(),
+        },
+        categoriesBySaleProductId: {
+          load: jest.fn(),
+        },
+        organizationById: {
+          load: jest.fn(),
+        },
+      },
+      repositories: {
+        categoryRepository: {
+          findAll: jest.fn().mockResolvedValue([]),
+        },
+        donationProjectRepository: {
+          findConnection: jest.fn().mockResolvedValue({
+            edges: [],
+            pageInfo: {
+              endCursor: null,
+              hasNextPage: false,
+            },
+          }),
+        },
+        organizationRepository: {
+          findConnection: jest.fn().mockResolvedValue({
+            edges: [],
+            pageInfo: {
+              endCursor: null,
+              hasNextPage: false,
+            },
+          }),
+        },
+        saleProductRepository: {
+          findConnection: jest.fn().mockResolvedValue({
+            edges: [],
+            pageInfo: {
+              endCursor: null,
+              hasNextPage: false,
+            },
+          }),
+        },
+      },
+    } as unknown as GraphqlContext;
+
     const apiApp = await createApp(appEnvironment, {
       isInitialized: true,
-    } as DataSource);
+    } as DataSource, {
+      createGraphqlContext: async () => graphqlContext,
+    });
 
     app = apiApp.app;
     apolloServer = apiApp.apolloServer;

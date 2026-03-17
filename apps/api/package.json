@@ -5,6 +5,9 @@
   "nx": {
     "targets": {
       "build": {
+        "dependsOn": [
+          "graphql-schema-generate"
+        ],
         "executor": "nx:run-commands",
         "options": {
           "command": "webpack-cli build",
@@ -54,6 +57,13 @@
           "copy-workspace-modules"
         ],
         "executor": "nx:noop"
+      },
+      "graphql-schema-generate": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "pnpm exec ts-node --project ./tsconfig.app.json -r tsconfig-paths/register ./src/scripts/generate-graphql-schema.ts",
+          "cwd": "apps/api"
+        }
       },
       "serve": {
         "continuous": true,
@@ -142,7 +152,9 @@
     "@apollo/server": "^5.4.0",
     "@as-integrations/express5": "^1.1.2",
     "@aws-sdk/client-ssm": "^3.1010.0",
+    "class-validator": "^0.15.1",
     "cors": "^2.8.6",
+    "dataloader": "^2.2.3",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "graphql": "^16.13.1",
@@ -150,6 +162,7 @@
     "reflect-metadata": "^0.1.13",
     "swagger-ui-express": "^5.0.1",
     "tslib": "^2.3.0",
+    "type-graphql": "^2.0.0-rc.2",
     "typeorm": "^0.3.28"
   },
   "devDependencies": {
