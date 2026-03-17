@@ -81,6 +81,9 @@
 - staging deploy 時，GitHub Actions 會把 `APP_STAGE=staging` 與 `AWS_SSM_PARAMETER_PREFIX` 傳給 EC2 上的 compose stack
 - 若 staging RDS 需要 CA bundle，先把憑證放到 EC2 的 `deploy/certs/rds/`，再把 GitHub Actions environment variable `STAGING_DB_SSL_ROOT_CERT_PATH` 設成 container 內路徑，例如 `/run/certs/rds/ap-southeast-2-bundle.pem`
 - `ap-southeast-2` 的 RDS CA bundle 可從 `https://truststore.pki.rds.amazonaws.com/ap-southeast-2/ap-southeast-2-bundle.pem` 下載到 `deploy/certs/rds/ap-southeast-2-bundle.pem`
+- staging 的 `api` / `client` / `nginx` container logs 會透過 Docker `awslogs` driver 送到 CloudWatch Logs，預設 log group 分別為 `/deploy-flow/staging/api`、`/deploy-flow/staging/client`、`/deploy-flow/staging/nginx`
+- 若要改名，可在 deploy shell 額外提供 `CLOUDWATCH_LOG_GROUP_API`、`CLOUDWATCH_LOG_GROUP_CLIENT`、`CLOUDWATCH_LOG_GROUP_NGINX`
+- EC2 instance role 需要至少具備 `logs:CreateLogGroup`、`logs:CreateLogStream`、`logs:PutLogEvents`、`logs:DescribeLogStreams`
 - staging demo seed 不建議在每次 deploy 自動執行；應保留為手動 job 或另開管理指令
 
 ## 進度維護規則

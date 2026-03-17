@@ -11,6 +11,13 @@ services:
       DB_SSL_ROOT_CERT_PATH: ${DB_SSL_ROOT_CERT_PATH:-}
     volumes:
       - ./certs/rds:/run/certs/rds:ro
+    logging:
+      driver: awslogs
+      options:
+        awslogs-create-group: "true"
+        awslogs-group: ${CLOUDWATCH_LOG_GROUP_API:-/deploy-flow/staging/api}
+        awslogs-region: ${AWS_REGION}
+        awslogs-stream: api
     restart: unless-stopped
 
   client:
@@ -20,6 +27,13 @@ services:
       PORT: "3000"
     depends_on:
       - api
+    logging:
+      driver: awslogs
+      options:
+        awslogs-create-group: "true"
+        awslogs-group: ${CLOUDWATCH_LOG_GROUP_CLIENT:-/deploy-flow/staging/client}
+        awslogs-region: ${AWS_REGION}
+        awslogs-stream: client
     restart: unless-stopped
 
   nginx:
@@ -34,4 +48,11 @@ services:
     depends_on:
       - client
       - api
+    logging:
+      driver: awslogs
+      options:
+        awslogs-create-group: "true"
+        awslogs-group: ${CLOUDWATCH_LOG_GROUP_NGINX:-/deploy-flow/staging/nginx}
+        awslogs-region: ${AWS_REGION}
+        awslogs-stream: nginx
     restart: unless-stopped
