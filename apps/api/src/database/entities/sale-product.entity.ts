@@ -13,6 +13,7 @@ import { OrganizationEntity } from './organization.entity';
 import { ProductCategoryEntity } from './product-category.entity';
 
 @Entity({ name: 'sale_products' })
+@Index('idx_sale_products_created_at_id', ['createdAt', 'id'])
 @Index('idx_sale_products_cover_asset_id', ['coverAssetId'])
 @Index('idx_sale_products_organization_id', ['organizationId'])
 export class SaleProductEntity extends TimestampedEntity {

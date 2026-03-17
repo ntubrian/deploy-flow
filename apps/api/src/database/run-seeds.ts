@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import { loadDatabaseConfig } from '../config/app-env';
-import { seedCatalog } from './seeds/catalog.seed';
+import { demoCatalogSeedCounts, seedCatalog } from './seeds/catalog.seed';
 import { createAppDataSource } from './typeorm.datasource';
 
 async function runSeeds(): Promise<void> {
@@ -11,6 +11,7 @@ async function runSeeds(): Promise<void> {
   try {
     await dataSource.initialize();
     await seedCatalog(dataSource);
+    console.log('Database seeds completed', demoCatalogSeedCounts);
   } finally {
     if (dataSource.isInitialized) {
       await dataSource.destroy();

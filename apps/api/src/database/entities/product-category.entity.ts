@@ -1,6 +1,7 @@
 import {
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
@@ -10,6 +11,7 @@ import { CategoryEntity } from './category.entity';
 import { SaleProductEntity } from './sale-product.entity';
 
 @Entity({ name: 'product_categories' })
+@Index('idx_product_categories_category_sale_product', ['categoryId', 'saleProductId'])
 export class ProductCategoryEntity {
   @ManyToOne(() => CategoryEntity, (category) => category.productCategories, {
     nullable: false,

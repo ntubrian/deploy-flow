@@ -64,6 +64,9 @@
 
 - 啟動本機 PostgreSQL：`pnpm nx run @deploy-flow/api:dev-db-up`
 - 執行 migration：`pnpm nx run @deploy-flow/api:db-migration-run`
+- 查看 migration 狀態：`pnpm nx run @deploy-flow/api:db-migration-show`
+- 產生 migration：`pnpm nx run @deploy-flow/api:db-migration-generate --name=<migration-name>`
+- 建立空白 migration：`pnpm nx run @deploy-flow/api:db-migration-create --name=<migration-name>`
 - 寫入 demo seed：`pnpm nx run @deploy-flow/api:db-seed-run`
 - 啟動 API：`pnpm nx serve @deploy-flow/api`
 - local Docker PostgreSQL host port：`5433`
@@ -71,6 +74,7 @@
 - local GraphQL Sandbox：`http://localhost:3000/api/graphql`
 - local Swagger UI：`http://localhost:3000/api/docs/`
 - local OpenAPI JSON：`http://localhost:3000/api/openapi.json`
+- 詳細 migration 流程文件：`docs/typeorm-migrations.md`
 - 若要關閉本機 PostgreSQL：`pnpm nx run @deploy-flow/api:dev-db-down`
 
 ## Staging API 操作規則
@@ -199,16 +203,24 @@
 
 - database schema 變更一律走 migration，不使用 TypeORM auto sync / `synchronize: true`
 
-- [ ] 安裝 `express`
-- [ ] 安裝 `@apollo/server`
-- [ ] 安裝 `@as-integrations/express5`
-- [ ] 安裝 TypeORM database driver
-- [ ] 建立 Express app bootstrap
-- [ ] 建立 Apollo GraphQL middleware 設定
-- [ ] 建立 TypeORM `DataSource` 設定
-- [ ] 確認所有環境關閉 TypeORM auto sync
-- [ ] 建立環境變數設定檔
-- [ ] 定義 `local full env + non-local full SSM` 設定策略
+- [x] 安裝 `express`（2026-03-17）
+- [x] 安裝 `@apollo/server`（2026-03-17）
+- [x] 安裝 `@as-integrations/express5`（2026-03-17）
+- [x] 安裝 TypeORM database driver（2026-03-17）
+- [x] 建立 Express app bootstrap（2026-03-17）
+- [x] 建立 Apollo GraphQL middleware 設定（2026-03-17）
+- [x] 建立 TypeORM `DataSource` 設定（2026-03-17）
+- [x] 確認所有環境關閉 TypeORM auto sync（2026-03-17）
+- [x] 建立環境變數設定檔（2026-03-17）
+- [x] 定義 `local full env + non-local full SSM` 設定策略（2026-03-17）
+
+### Staging / Deploy
+
+- [x] 設定 staging API 透過 SSM 讀取 database 與 web gate secrets（2026-03-17）
+- [x] 設定 staging RDS CA bundle 掛載到 API container（2026-03-17）
+- [x] 設定 staging `api` / `client` / `nginx` logs 送到 CloudWatch Logs（2026-03-17）
+- [x] 驗證 staging `/api/health` 可用（2026-03-17）
+- [x] 驗證 staging `/api/graphql` 可載入 Apollo Sandbox（2026-03-17）
 
 ### 基本驗證 / Security
 
@@ -220,47 +232,47 @@
 - [ ] 建立全域 auth middleware
 - [ ] 設定 auth whitelist
 - [ ] 加入 cookie parser
-- [ ] 設定 CORS credentials 策略
-- [ ] 定義 SSM shared secret 載入策略
-- [ ] 定義 SSM session secret 載入策略
+- [x] 設定 CORS credentials 策略（2026-03-17）
+- [x] 定義 SSM shared secret 載入策略（2026-03-17）
+- [x] 定義 SSM session secret 載入策略（2026-03-17）
 - [ ] 定義 cookie expiration 設定
 - [ ] 加入 auth rate limiting
-- [ ] 定義 EC2 啟動時讀取 secret 的策略
-- [ ] 定義 Parameter Store / Secrets Manager secret 路徑命名
+- [x] 定義 EC2 啟動時讀取 secret 的策略（2026-03-17）
+- [x] 定義 Parameter Store / Secrets Manager secret 路徑命名（2026-03-17）
 
 ### 資料表 / Entity
 
-- [ ] 建立 `AssetEntity`
-- [ ] 建立 `CategoryEntity`
-- [ ] 建立 `OrganizationEntity`
-- [ ] 建立 `DonationProjectEntity`
-- [ ] 建立 `SaleProductEntity`
-- [ ] 建立 `OrganizationCategoryEntity`
-- [ ] 建立 `ProjectCategoryEntity`
-- [ ] 建立 `ProductCategoryEntity`
-- [ ] 設定 organization -> logo relation
-- [ ] 設定 organization -> categories relation
-- [ ] 設定 donation project -> organization relation
-- [ ] 設定 donation project -> categories relation
-- [ ] 設定 donation project -> cover relation
-- [ ] 設定 sale product -> organization relation
-- [ ] 設定 sale product -> categories relation
-- [ ] 設定 sale product -> cover relation
+- [x] 建立 `AssetEntity`（2026-03-17）
+- [x] 建立 `CategoryEntity`（2026-03-17）
+- [x] 建立 `OrganizationEntity`（2026-03-17）
+- [x] 建立 `DonationProjectEntity`（2026-03-17）
+- [x] 建立 `SaleProductEntity`（2026-03-17）
+- [x] 建立 `OrganizationCategoryEntity`（2026-03-17）
+- [x] 建立 `ProjectCategoryEntity`（2026-03-17）
+- [x] 建立 `ProductCategoryEntity`（2026-03-17）
+- [x] 設定 organization -> logo relation（2026-03-17）
+- [x] 設定 organization -> categories relation（2026-03-17）
+- [x] 設定 donation project -> organization relation（2026-03-17）
+- [x] 設定 donation project -> categories relation（2026-03-17）
+- [x] 設定 donation project -> cover relation（2026-03-17）
+- [x] 設定 sale product -> organization relation（2026-03-17）
+- [x] 設定 sale product -> categories relation（2026-03-17）
+- [x] 設定 sale product -> cover relation（2026-03-17）
 
 ### Migration / Seed
 
-- [ ] 建立初始 migration
-- [ ] 建立 migration 執行指令
-- [ ] 建立 migration rollback 指令
-- [ ] 建立 categories seed
-- [ ] 建立 organizations seed
-- [ ] 建立 donation projects seed
-- [ ] 建立 sale products seed
-- [ ] 建立 asset seed
-- [ ] 建立 organization_categories seed
-- [ ] 建立 project_categories seed
-- [ ] 建立 product_categories seed
-- [ ] 建立 seed 執行指令
+- [x] 建立初始 migration（2026-03-17）
+- [x] 建立 migration 執行指令（2026-03-17）
+- [x] 建立 migration rollback 指令（2026-03-17）
+- [x] 建立 categories seed（2026-03-17）
+- [x] 建立 organizations seed（2026-03-17）
+- [x] 建立 donation projects seed（2026-03-17）
+- [x] 建立 sale products seed（2026-03-17）
+- [x] 建立 asset seed（2026-03-17）
+- [x] 建立 organization_categories seed（2026-03-17）
+- [x] 建立 project_categories seed（2026-03-17）
+- [x] 建立 product_categories seed（2026-03-17）
+- [x] 建立 seed 執行指令（2026-03-17）
 - [ ] 驗證 seed 後三個 tab 都有資料
 
 ### Repository Pattern

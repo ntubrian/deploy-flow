@@ -1,6 +1,7 @@
 import {
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
@@ -10,6 +11,7 @@ import { CategoryEntity } from './category.entity';
 import { DonationProjectEntity } from './donation-project.entity';
 
 @Entity({ name: 'project_categories' })
+@Index('idx_project_categories_category_project', ['categoryId', 'donationProjectId'])
 export class ProjectCategoryEntity {
   @ManyToOne(() => CategoryEntity, (category) => category.projectCategories, {
     nullable: false,

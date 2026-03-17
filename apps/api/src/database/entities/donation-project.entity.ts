@@ -13,6 +13,7 @@ import { OrganizationEntity } from './organization.entity';
 import { ProjectCategoryEntity } from './project-category.entity';
 
 @Entity({ name: 'donation_projects' })
+@Index('idx_donation_projects_created_at_id', ['createdAt', 'id'])
 @Index('idx_donation_projects_cover_asset_id', ['coverAssetId'])
 @Index('idx_donation_projects_organization_id', ['organizationId'])
 export class DonationProjectEntity extends TimestampedEntity {

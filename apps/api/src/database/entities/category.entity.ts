@@ -6,7 +6,7 @@ import { ProductCategoryEntity } from './product-category.entity';
 import { ProjectCategoryEntity } from './project-category.entity';
 
 @Entity({ name: 'categories' })
-@Index('idx_categories_sort_order', ['sortOrder'])
+@Index('idx_categories_sort_order_id', ['sortOrder', 'id'])
 export class CategoryEntity extends TimestampedEntity {
   @Column({ name: 'name', type: 'varchar', length: 120 })
   name!: string;

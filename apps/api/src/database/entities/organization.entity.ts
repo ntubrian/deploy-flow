@@ -14,6 +14,7 @@ import { OrganizationCategoryEntity } from './organization-category.entity';
 import { SaleProductEntity } from './sale-product.entity';
 
 @Entity({ name: 'organizations' })
+@Index('idx_organizations_created_at_id', ['createdAt', 'id'])
 @Index('idx_organizations_logo_asset_id', ['logoAssetId'])
 export class OrganizationEntity extends TimestampedEntity {
   @OneToMany(
