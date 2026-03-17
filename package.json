@@ -10,7 +10,7 @@
     "build": "pnpm nx run-many -t build --projects=@deploy-flow/client,@deploy-flow/api",
     "lint": "pnpm nx run-many -t lint --projects=@deploy-flow/client,@deploy-flow/api -- --max-warnings=0",
     "lint:fix": "pnpm nx run-many -t lint --projects=@deploy-flow/client,@deploy-flow/api -- --fix",
-    "prepare": "husky"
+    "prepare": "node -e \"const fs=require('node:fs');const cp=require('node:child_process');const path=require('node:path');const root=process.cwd();const gitDir=path.join(root,'.git');const bin=path.join(root,'node_modules','.bin',process.platform==='win32'?'husky.cmd':'husky');if(!fs.existsSync(gitDir)||!fs.existsSync(bin))process.exit(0);const result=cp.spawnSync(bin,{stdio:'inherit'});process.exit(typeof result.status==='number'?result.status:0);\""
   },
   "private": true,
   "devDependencies": {
