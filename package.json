@@ -7,7 +7,10 @@
     "dev": "pnpm nx dev @deploy-flow/client",
     "dev:client": "pnpm nx dev @deploy-flow/client",
     "dev:api": "pnpm nx serve @deploy-flow/api",
-    "build": "pnpm nx run-many -t build --projects=@deploy-flow/client,@deploy-flow/api"
+    "build": "pnpm nx run-many -t build --projects=@deploy-flow/client,@deploy-flow/api",
+    "lint": "pnpm nx run-many -t lint --projects=@deploy-flow/client,@deploy-flow/api -- --max-warnings=0",
+    "lint:fix": "pnpm nx run-many -t lint --projects=@deploy-flow/client,@deploy-flow/api -- --fix",
+    "prepare": "husky"
   },
   "private": true,
   "devDependencies": {
@@ -42,11 +45,16 @@
     "cypress": "^15.8.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-cypress": "^3.5.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsx-a11y": "6.10.1",
+    "eslint-plugin-n": "^17.24.0",
+    "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-react": "7.35.0",
     "eslint-plugin-react-hooks": "5.0.0",
+    "globals": "^17.4.0",
+    "husky": "^9.1.7",
     "jest": "^30.0.2",
     "jest-environment-jsdom": "^30.0.2",
     "jest-environment-node": "^30.0.2",
