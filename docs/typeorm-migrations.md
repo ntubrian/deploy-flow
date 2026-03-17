@@ -132,3 +132,11 @@ pnpm nx run @deploy-flow/api:db-seed-run
 - 若 `DB_SSL=true`，請一併確認 `DB_SSL_ROOT_CERT_PATH` 是否指到正確檔案
 - staging / production 不建議從開發者本機直接產 migration；migration 檔應在 local 產生、commit 後再透過 deploy workflow 執行
 - 若 migration 內容明顯不合理，先確認 local DB 是否已經先跑到最新 migration
+
+## Staging Deploy 流程
+
+- staging deploy workflow 會固定執行 `db-migration-show -> db-migration-run -> db-migration-show`
+- `db-migration-run` 不需要先手動判斷是否有新 migration；TypeORM 會依照 `typeorm_migrations` 自己判斷 pending migrations
+- 若 staging 沒有新的 migration 檔需要套用，`db-migration-run` 會直接成功結束
+- 若 migration 失敗，deploy workflow 會中止，不會繼續更新 API / client container
+- `db-seed-run` 不會在 staging deploy 自動執行，避免覆寫既有資料

@@ -55,7 +55,8 @@
 ## Migration 策略
 
 - local / dev 的 migration 可由開發者手動執行，用來驗證本機 Docker PostgreSQL schema
-- staging migration 應在 CI / deploy workflow 內執行，不建議由開發者從本機手動連 staging database 執行
+- staging migration 由 deploy workflow 在 EC2 上先執行 `db-migration-show -> db-migration-run -> db-migration-show`，再更新 container
+- staging migration 不建議由開發者從本機手動連 staging database 執行
 - production migration 也應走 deploy workflow，並在 release 過程中確保同一時間只會有一個 migration job 執行
 - deploy workflow 內的 migration job 應使用與應用程式相同的 SSM 參數來源與 IAM 權限
 - rollback 不應預設自動執行；若 migration 失敗，先停止 release，再依 migration 內容決定人工 rollback 策略
@@ -83,7 +84,10 @@
 - staging Swagger UI 路徑固定為 `https://stg.bin-hq.com/api/docs/`
 - staging OpenAPI JSON 路徑固定為 `https://stg.bin-hq.com/api/openapi.json`
 - staging deploy 時，GitHub Actions 會把 `APP_STAGE=staging` 與 `AWS_SSM_PARAMETER_PREFIX` 傳給 EC2 上的 compose stack
+- staging deploy 會先在 EC2 repo checkout 上執行 `pnpm nx run @deploy-flow/api:db-migration-show`、`db-migration-run`、`db-migration-show`
+- staging host 需要有 `node`、`corepack/pnpm` 與 workspace dependencies，deploy workflow 會在 `git pull` 後執行 `pnpm install --frozen-lockfile`
 - 若 staging RDS 需要 CA bundle，先把憑證放到 EC2 的 `deploy/certs/rds/`，再把 GitHub Actions environment variable `STAGING_DB_SSL_ROOT_CERT_PATH` 設成 container 內路徑，例如 `/run/certs/rds/ap-southeast-2-bundle.pem`
+- deploy workflow 會用上述 container 路徑自動推導 host 端 migration runner 的憑證路徑，例如 `${STAGING_APP_DIR}/deploy/certs/rds/ap-southeast-2-bundle.pem`
 - `ap-southeast-2` 的 RDS CA bundle 可從 `https://truststore.pki.rds.amazonaws.com/ap-southeast-2/ap-southeast-2-bundle.pem` 下載到 `deploy/certs/rds/ap-southeast-2-bundle.pem`
 - staging 的 `api` / `client` / `nginx` container logs 會透過 Docker `awslogs` driver 送到 CloudWatch Logs，預設 log group 分別為 `/deploy-flow/staging/api`、`/deploy-flow/staging/client`、`/deploy-flow/staging/nginx`
 - 若要改名，可在 deploy shell 額外提供 `CLOUDWATCH_LOG_GROUP_API`、`CLOUDWATCH_LOG_GROUP_CLIENT`、`CLOUDWATCH_LOG_GROUP_NGINX`
