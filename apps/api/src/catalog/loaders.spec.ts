@@ -3,35 +3,46 @@ import { createCatalogLoaders } from './loaders';
 import type { CatalogRepositories } from './repositories';
 
 describe('catalog loaders', () => {
+  const assetFindByIds = jest.fn();
+  const categoryFindAll = jest.fn();
+  const categoryFindByDonationProjectIds = jest.fn();
+  const categoryFindByIds = jest.fn();
+  const categoryFindByOrganizationIds = jest.fn();
+  const categoryFindBySaleProductIds = jest.fn();
+  const donationProjectFindConnection = jest.fn();
+  const organizationFindByIds = jest.fn();
+  const organizationFindConnection = jest.fn();
+  const saleProductFindConnection = jest.fn();
+
   const repositories = {
     assetRepository: {
-      findByIds: jest.fn(),
+      findByIds: assetFindByIds,
     },
     categoryRepository: {
-      findAll: jest.fn(),
-      findByDonationProjectIds: jest.fn(),
-      findByIds: jest.fn(),
-      findByOrganizationIds: jest.fn(),
-      findBySaleProductIds: jest.fn(),
+      findAll: categoryFindAll,
+      findByDonationProjectIds: categoryFindByDonationProjectIds,
+      findByIds: categoryFindByIds,
+      findByOrganizationIds: categoryFindByOrganizationIds,
+      findBySaleProductIds: categoryFindBySaleProductIds,
     },
     donationProjectRepository: {
-      findConnection: jest.fn(),
+      findConnection: donationProjectFindConnection,
     },
     organizationRepository: {
-      findByIds: jest.fn(),
-      findConnection: jest.fn(),
+      findByIds: organizationFindByIds,
+      findConnection: organizationFindConnection,
     },
     saleProductRepository: {
-      findConnection: jest.fn(),
+      findConnection: saleProductFindConnection,
     },
-  } as unknown as jest.Mocked<CatalogRepositories>;
+  } as unknown as CatalogRepositories;
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('batches assets and preserves key order', async () => {
-    repositories.assetRepository.findByIds.mockResolvedValue([
+    assetFindByIds.mockResolvedValue([
       {
         altText: 'second',
         id: 'asset-2',
@@ -47,10 +58,7 @@ describe('catalog loaders', () => {
     const loaders = createCatalogLoaders(repositories);
     const assets = await loaders.assetById.loadMany(['asset-1', 'asset-2']);
 
-    expect(repositories.assetRepository.findByIds).toHaveBeenCalledWith([
-      'asset-1',
-      'asset-2',
-    ]);
+    expect(assetFindByIds).toHaveBeenCalledWith(['asset-1', 'asset-2']);
     expect(assets).toEqual([
       {
         altText: 'first',
@@ -66,7 +74,7 @@ describe('catalog loaders', () => {
   });
 
   it('returns grouped categories for organizations', async () => {
-    repositories.categoryRepository.findByOrganizationIds.mockResolvedValue(
+    categoryFindByOrganizationIds.mockResolvedValue(
       new Map([
         [
           'organization-1',
@@ -87,7 +95,7 @@ describe('catalog loaders', () => {
       'organization-2',
     ]);
 
-    expect(repositories.categoryRepository.findByOrganizationIds).toHaveBeenCalledWith([
+    expect(categoryFindByOrganizationIds).toHaveBeenCalledWith([
       'organization-1',
       'organization-2',
     ]);
