@@ -1,5 +1,6 @@
 import { createCatalogLoaders } from './loaders';
-import { CatalogRepositories } from './repositories';
+
+import type { CatalogRepositories } from './repositories';
 
 describe('catalog loaders', () => {
   const repositories = {

@@ -1,9 +1,10 @@
 import DataLoader from 'dataloader';
 
-import { CatalogRepositories } from './repositories';
 import { AssetEntity } from '../database/entities/asset.entity';
 import { CategoryEntity } from '../database/entities/category.entity';
 import { OrganizationEntity } from '../database/entities/organization.entity';
+
+import type { CatalogRepositories } from './repositories';
 
 export interface CatalogLoaders {
   assetById: DataLoader<string, AssetEntity>;
