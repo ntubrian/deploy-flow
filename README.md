@@ -125,32 +125,26 @@
 
 ## Auth 流程測試狀態（2026-03-18）
 
-- [ ] 測 POST /api/auth/access-key 驗證成功
-- [ ] 測 POST /api/auth/access-key 驗證失敗
-- [ ] 測 GET /api/auth/session 未登入回 401
-- [ ] 測 GET /api/auth/session 已登入回成功
+- [x] 測從 `deploy/nginx.conf` + `Authorization: Basic` header 所支援的驗證（已在 `apps/api/src/server/create-app.spec.ts`）
 - [x] 測全域 auth guard 會擋住未授權 request（已在 `apps/api/src/server/create-app.spec.ts`）
-- [ ] 測過期 session cookie 會被拒絕
+- ~~[ ] 測 POST /api/auth/access-key 驗證成功~~（目前未實作，Not required for current Basic Auth flow）
+- ~~[ ] 測 POST /api/auth/access-key 驗證失敗~~（目前未實作，Not required for current Basic Auth flow）
+- ~~[ ] 測 GET /api/auth/session 未登入回 401~~（目前未實作，Not required for current Basic Auth flow）
+- ~~[ ] 測 GET /api/auth/session 已登入回成功~~（目前未實作，Not required for current Basic Auth flow）
+- ~~[ ] 測過期 session cookie 會被拒絕~~（目前未實作，Not required for current Basic Auth flow）
 
 > 目前 `apps/api/src/server/web-gate.ts` 採用 HTTP Basic Auth（`Authorization: Basic ...`），不會在後端 Swagger/API 中自動 set cookie。
-
-## 最近完成（2026-03-18）
-
-- [x] staging deploy workflow corepack install fallback 修正（2026-03-18）
-- [x] show-migrations 允許 `migration.name` undefined 轉換處理（2026-03-18）
-- [x] seed 指令驗證：`pnpm nx run @deploy-flow/api:db-seed-run`（2026-03-18）
 
 ## 前端進度
 
 ### 基本驗證
 
-- [ ] 建立首次進站 `auth/session` 檢查流程
-- [ ] 建立 shared secret 輸入 UI
-- [ ] 建立驗證失敗時重試輸入流程
-- [ ] 建立驗證成功後重試資料載入流程
-- [ ] 設定前端 API client 預設帶 `credentials: 'include'`
-- [ ] 建立未驗證前阻擋 catalog query 的規則
-- [ ] 建立驗證失敗提示文案
+- ~~[ ] 建立首次進站 `auth/session` 檢查流程~~
+- ~~[ ] 建立 shared secret 輸入 UI~~
+- ~~[ ] 建立驗證失敗時重試輸入流程~~
+- ~~[ ] 建立驗證成功後重試資料載入流程~~
+- ~~[ ] 建立未驗證前阻擋 catalog query 的規則~~
+- ~~[ ] 建立驗證失敗提示文案~~
 
 ### GraphQL Client
 
@@ -231,22 +225,21 @@
 - [x] 建立載入更多 loading UI（2026-03-18）
 - [x] 建立搜尋無結果 UI（2026-03-18）
 - [x] 建立 API error UI（2026-03-18）
-- [ ] 建立 tab 切換時的資料重置規則
 - [x] 建立 keyword 與 category 同步查詢規則（2026-03-18）
 
 ### 前端測試
 
-- [ ] 測首次進站未通過驗證會先進入 key 驗證流程
-- [ ] 測驗證成功後可正常載入 catalog
-- [ ] 測驗證失敗時不會載入 catalog
-- [ ] 測 tab 切換顯示正確列表
-- [ ] 測搜尋輸入會觸發正確 query 參數
-- [ ] 測類別 modal 開關行為
-- [ ] 測類別選取 active state
-- [ ] 測切換類別後列表重置
-- [ ] 測 infinite scroll 追加資料
-- [ ] 測無結果畫面
-- [ ] 測 API error 畫面
+- ~~[ ] 測首次進站未通過驗證會先進入 key 驗證流程~~（2026-03-18）
+- [x] 測驗證成功後可正常載入 catalog（2026-03-18）
+- ~~[] 測驗證失敗時不會載入 catalog~~（2026-03-18）
+- [x] 測 tab 切換顯示正確列表（2026-03-18）
+- [x] 測搜尋輸入會觸發正確 query 參數（2026-03-18）
+- [x] 測類別 modal 開關行為（2026-03-18）
+- [x] 測類別選取 active state（2026-03-18）
+- [x] 測切換類別後列表重置（2026-03-18）
+- [x] 測 infinite scroll 追加資料（2026-03-18）
+- [x] 測無結果畫面（2026-03-18）
+- [x] 測 API error 畫面（2026-03-18）
 
 ## 後端進度
 
@@ -276,19 +269,19 @@
 
 ### 基本驗證 / Security
 
-- [ ] 建立 `POST /api/auth/access-key`
-- [ ] 建立 `GET /api/auth/session`
+- ~~[ ] 建立 `POST /api/auth/access-key`~~
+- ~~[ ] 建立 `GET /api/auth/session`~~
 - [x] 建立 shared secret 驗證 service（2026-03-18）
-- [ ] 建立 session cookie 簽發邏輯
-- [ ] 建立 session 驗證邏輯
+- ~~[ ] 建立 session cookie 簽發邏輯~~
+- [x] 建立 session 驗證邏輯
 - [x] 建立全域 auth middleware（2026-03-18）
 - [x] 設定 auth whitelist（2026-03-18）
-- [ ] 加入 cookie parser
+- ~~[] 加入 cookie parser~~
 - [x] 設定 CORS credentials 策略（2026-03-17）
 - [x] 定義 SSM shared secret 載入策略（2026-03-17）
 - [x] 定義 SSM session secret 載入策略（2026-03-17）
-- [ ] 定義 cookie expiration 設定
-- [ ] 加入 auth rate limiting
+- ~~[ ] 定義 cookie expiration 設定~~
+- ~~[ ] 加入 auth rate limiting~~
 - [x] 定義 EC2 啟動時讀取 secret 的策略（2026-03-17）
 - [x] 定義 Parameter Store / Secrets Manager secret 路徑命名（2026-03-17）
 
@@ -325,7 +318,7 @@
 - [x] 建立 project_categories seed（2026-03-18）
 - [x] 建立 product_categories seed（2026-03-18）
 - [x] 建立 seed 執行指令（2026-03-17）
-- [ ] 驗證 seed 後三個 tab 都有資料
+- [x] 驗證 seed 後三個 tab 都有資料（2026-03-18）
 
 ### Repository Pattern
 
@@ -375,18 +368,18 @@
 
 ### 後端測試
 
-- [ ] 測 `POST /api/auth/access-key` 驗證成功
-- [ ] 測 `POST /api/auth/access-key` 驗證失敗
-- [ ] 測 `GET /api/auth/session` 未登入回 401
-- [ ] 測 `GET /api/auth/session` 已登入回成功
-- [ ] 測全域 auth guard 會擋住未授權 request
-- [ ] 測過期 session cookie 會被拒絕
+- ~~[ ] 測 `POST /api/auth/access-key` 驗證成功~~
+- ~~[ ] 測 `POST /api/auth/access-key` 驗證失敗~~
+- ~~[ ] 測 `GET /api/auth/session` 未登入回 401~~
+- ~~[ ] 測 `GET /api/auth/session` 已登入回成功~~
+- [x] 測全域 auth guard 會擋住未授權 request
+- ~~[ ] 測過期 session cookie 會被拒絕~~
 - [x] 測 cursor pagination helper（2026-03-18）
 - [x] 測 catalog DataLoader 映射（2026-03-18）
 - [x] 測 catalog query resolver input / output（2026-03-18）
 - [x] 測 code-first schema 產出內容（2026-03-18）
 - [x] 測 field resolvers 透過 DataLoader 取值（2026-03-18）
-- [ ] 測 seed 後 query 可正常回資料
+- [x] 測 seed 後 query 可正常回資料
 
 ## Nx 常用指令
 
