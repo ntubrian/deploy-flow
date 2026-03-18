@@ -3,16 +3,18 @@ import { ApolloServerPluginCacheControlDisabled } from '@apollo/server/plugin/di
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { expressMiddleware } from '@as-integrations/express5';
 import cors from 'cors';
-import express, { type Express } from 'express';
+import express, { type Express, type RequestHandler } from 'express';
 import { DocumentNode } from 'graphql';
 import * as swaggerUi from 'swagger-ui-express';
 import { DataSource } from 'typeorm';
 
 import { BoundedMemoryCache } from './bounded-memory-cache';
-import { type GraphqlContext } from './graphql-context';
 import { buildOpenApiDocument } from './openapi';
 import { type AppEnvironment } from '../config/app-env';
 import { getGraphqlSchema } from '../graphql/schema';
+
+import type { GraphqlContext } from './graphql-context';
+
 
 export interface ApiApp {
   apolloServer: ApolloServer;
@@ -34,9 +36,10 @@ async function createDefaultGraphqlContext(
   appEnvironment: AppEnvironment,
   dataSource: DataSource
 ): Promise<GraphqlContext> {
-  const { createGraphqlContext } = await import('./graphql-context');
+  const graphqlContextModule =
+    (await import('./graphql-context.js')) as typeof import('./graphql-context');
 
-  return createGraphqlContext(appEnvironment, dataSource);
+  return graphqlContextModule.createGraphqlContext(appEnvironment, dataSource);
 }
 
 export async function createApp(
@@ -118,15 +121,17 @@ export async function createApp(
     );
   }
 
+  const graphqlHandler = expressMiddleware(apolloServer, {
+    context: async () =>
+      (options.createGraphqlContext ?? createDefaultGraphqlContext)(
+        appEnvironment,
+        dataSource
+      ),
+  }) as unknown as RequestHandler;
+
   app.use(
     `/${appEnvironment.apiPrefix}/${appEnvironment.graphqlPath}`,
-    expressMiddleware(apolloServer, {
-      context: async () =>
-        (options.createGraphqlContext ?? createDefaultGraphqlContext)(
-          appEnvironment,
-          dataSource
-        ),
-    })
+    graphqlHandler
   );
 
   return {

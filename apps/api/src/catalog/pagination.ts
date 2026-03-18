@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { Brackets, SelectQueryBuilder } from 'typeorm';
+import { Brackets, type ObjectLiteral, type SelectQueryBuilder } from 'typeorm';
 
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 50;
@@ -99,7 +99,7 @@ export function decodeCursor(cursor?: string | null): DecodedCursor | null {
   }
 }
 
-export function applyCursorPagination<TNode>(
+export function applyCursorPagination<TNode extends ObjectLiteral>(
   queryBuilder: SelectQueryBuilder<TNode>,
   alias: string,
   cursor: DecodedCursor | null
