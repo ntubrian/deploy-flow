@@ -39,7 +39,9 @@ async function showMigrations(): Promise<void> {
 
     const executedNames = await loadExecutedMigrationNames(dataSource);
     const executedNameSet = new Set(executedNames);
-    const allMigrations = dataSource.migrations.map((migration) => migration.name);
+    const allMigrations = dataSource.migrations
+      .map((migration) => migration.name)
+      .filter((migrationName): migrationName is string => typeof migrationName === 'string');
     const pendingMigrations = allMigrations.filter(
       (migrationName) => !executedNameSet.has(migrationName)
     );
