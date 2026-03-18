@@ -10,6 +10,7 @@ import { DataSource } from 'typeorm';
 
 import { BoundedMemoryCache } from './bounded-memory-cache';
 import { buildOpenApiDocument } from './openapi';
+import { createWebGateMiddleware } from './web-gate';
 import { type AppEnvironment } from '../config/app-env';
 import { getGraphqlSchema } from '../graphql/schema';
 
@@ -89,6 +90,7 @@ export async function createApp(
     })
   );
   app.use(express.json());
+  app.use(`/${appEnvironment.apiPrefix}`, createWebGateMiddleware(appEnvironment));
 
   app.get(`/${appEnvironment.apiPrefix}/health`, (_request, response) => {
     response.json({

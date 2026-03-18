@@ -7,7 +7,8 @@
 - local database 使用 `docker-compose.dev.yml` 內的 PostgreSQL
 - migration 一律由 TypeORM migration 檔管理，不開 `synchronize: true`
 - 產生 migration 前，local database 必須先跑到目前最新 schema
-- TypeORM CLI 使用 [apps/api/src/database/typeorm.cli-datasource.ts](/Users/hezibin/bindev/deploy-flow/apps/api/src/database/typeorm.cli-datasource.ts)
+- TypeORM CLI datasource 只用於 local create / generate 類指令
+- `db-migration-run`、`db-migration-revert`、`db-migration-show` 走應用程式自己的 config loader，因此 local / staging / production 都會共用同一套 `APP_STAGE + AWS_SSM_PARAMETER_PREFIX` 規則
 
 ## 指令總覽
 
@@ -137,6 +138,7 @@ pnpm nx run @deploy-flow/api:db-seed-run
 
 - staging deploy workflow 會固定執行 `db-migration-show -> db-migration-run -> db-migration-show`
 - `db-migration-run` 不需要先手動判斷是否有新 migration；TypeORM 會依照 `typeorm_migrations` 自己判斷 pending migrations
+- `db-migration-show` 會列出目前已套用與待套用 migration 名稱，且支援 staging / production 的 SSM config
 - 若 staging 沒有新的 migration 檔需要套用，`db-migration-run` 會直接成功結束
 - 若 migration 失敗，deploy workflow 會中止，不會繼續更新 API / client container
 - `db-seed-run` 不會在 staging deploy 自動執行，避免覆寫既有資料

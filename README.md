@@ -22,18 +22,15 @@
 ## Web 基本驗證策略
 
 - 這一層是 `shared secret access gate`，用途是保護 web preview / internal access，不是正式會員登入系統
-- 前端不保存原始 secret key 到 `localStorage`、`sessionStorage` 或一般可被 JavaScript 讀取的 cookie
-- 首次進站時，前端先呼叫 `GET /api/auth/session`
-- 若 API 回 `401`，前端顯示 key 輸入流程；MVP 可先用原生 prompt，後續可換成自製 modal
-- 使用者輸入 key 後，前端呼叫 `POST /api/auth/access-key`
-- API 驗證成功後，回傳 `HttpOnly + Secure + SameSite=Strict` 的 session cookie
-- 後續 API / GraphQL request 一律使用 cookie session，前端 request 預設帶 `credentials: 'include'`
-- API 層使用全域 guard 驗證 cookie，白名單只保留 `auth/access-key`、`auth/session`、`health`
-- session cookie 存的是驗證後的 session，不是原始 shared secret
-- EC2 部署時，shared secret 與 cookie signing secret 預設存放在 AWS Systems Manager Parameter Store `SecureString`
-- 若未來需要自動 rotation、跨區域 replication 或更完整的 secret lifecycle，再升級為 AWS Secrets Manager
-- EC2 instance 透過 IAM role / instance profile 讀取 secret，應用程式啟動時載入到記憶體中使用，不在每個 request 重抓
-- 需要額外補強 rate limit、失敗登入紀錄、session 過期時間與 key rotation 機制
+- 前端層由 `deploy/nginx.conf` 對網站路徑 `/` 啟用 HTTP Basic Auth；瀏覽器通過驗證後，會自動對同 origin request 帶上 `Authorization` header
+- 後端層由 Express 全域 middleware 再驗一次 Basic Auth，避免繞過 Nginx 直接打 API
+- API 白名單只保留 `GET /api/health` 與 GraphQL `health` query；其他 `/api/*` 路徑都需要驗證
+- Basic Auth username 由 `WEB_GATE_BASIC_USERNAME` 決定，預設值是 `deploy-flow`
+- Basic Auth password 使用 `WEB_GATE_SHARED_SECRET`
+- staging / production 的 shared secret 預設存放在 AWS Systems Manager Parameter Store `SecureString`
+- EC2 instance 透過 IAM role / instance profile 讀取 shared secret，deploy 時同步產生 Nginx 用的 `deploy/auth/basic.htpasswd`
+- `WEB_GATE_SESSION_SECRET` 目前只保留為後續 cookie/session gate 擴充用，現階段未啟用
+- 若未來需要更細的權限模型、rotation 或登入紀錄，再升級成 session-based gate 或正式身份系統
 
 ## 後端設定來源策略
 
@@ -85,9 +82,10 @@
 - staging OpenAPI JSON 路徑固定為 `https://stg.bin-hq.com/api/openapi.json`
 - staging deploy 時，GitHub Actions 會把 `APP_STAGE=staging` 與 `AWS_SSM_PARAMETER_PREFIX` 傳給 EC2 上的 compose stack
 - staging deploy 會先在 EC2 repo checkout 上執行 `pnpm nx run @deploy-flow/api:db-migration-show`、`db-migration-run`、`db-migration-show`
-- staging host 需要有 `node`、`corepack/pnpm` 與 workspace dependencies，deploy workflow 會在 `git pull` 後執行 `pnpm install --frozen-lockfile`
+- staging host 需要有 `node >= 20.19`、`corepack/pnpm` 與 workspace dependencies，deploy workflow 會在 `git pull` 後以 `ec2-user` 執行 `pnpm install --frozen-lockfile`
 - 若 staging RDS 需要 CA bundle，先把憑證放到 EC2 的 `deploy/certs/rds/`，再把 GitHub Actions environment variable `STAGING_DB_SSL_ROOT_CERT_PATH` 設成 container 內路徑，例如 `/run/certs/rds/ap-southeast-2-bundle.pem`
 - deploy workflow 會用上述 container 路徑自動推導 host 端 migration runner 的憑證路徑，例如 `${STAGING_APP_DIR}/deploy/certs/rds/ap-southeast-2-bundle.pem`
+- staging deploy 也會用 `WEB_GATE_SHARED_SECRET` 自動產生 `deploy/auth/basic.htpasswd` 給 Nginx 使用
 - `ap-southeast-2` 的 RDS CA bundle 可從 `https://truststore.pki.rds.amazonaws.com/ap-southeast-2/ap-southeast-2-bundle.pem` 下載到 `deploy/certs/rds/ap-southeast-2-bundle.pem`
 - staging 的 `api` / `client` / `nginx` container logs 會透過 Docker `awslogs` driver 送到 CloudWatch Logs，預設 log group 分別為 `/deploy-flow/staging/api`、`/deploy-flow/staging/client`、`/deploy-flow/staging/nginx`
 - 若要改名，可在 deploy shell 額外提供 `CLOUDWATCH_LOG_GROUP_API`、`CLOUDWATCH_LOG_GROUP_CLIENT`、`CLOUDWATCH_LOG_GROUP_NGINX`
@@ -238,11 +236,11 @@
 
 - [ ] 建立 `POST /api/auth/access-key`
 - [ ] 建立 `GET /api/auth/session`
-- [ ] 建立 shared secret 驗證 service
+- [x] 建立 shared secret 驗證 service（2026-03-18）
 - [ ] 建立 session cookie 簽發邏輯
 - [ ] 建立 session 驗證邏輯
-- [ ] 建立全域 auth middleware
-- [ ] 設定 auth whitelist
+- [x] 建立全域 auth middleware（2026-03-18）
+- [x] 設定 auth whitelist（2026-03-18）
 - [ ] 加入 cookie parser
 - [x] 設定 CORS credentials 策略（2026-03-17）
 - [x] 定義 SSM shared secret 載入策略（2026-03-17）

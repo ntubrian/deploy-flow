@@ -62,6 +62,7 @@ describe('app-env', () => {
     expect(sendMock).not.toHaveBeenCalled();
     expect(ssmClientMock).not.toHaveBeenCalled();
     expect(appEnvironment.webGate).toEqual({
+      basicUsername: 'deploy-flow',
       sessionSecret: 'local-session-secret',
       sessionTtlSeconds: 86400,
       sharedSecret: 'local-shared-secret',
@@ -165,6 +166,7 @@ describe('app-env', () => {
 
     expect(ssmClientMock).toHaveBeenCalledWith({ region: 'ap-northeast-1' });
     expect(appEnvironment.webGate).toEqual({
+      basicUsername: 'deploy-flow',
       sessionSecret: 'staging-session-secret',
       sessionTtlSeconds: 86400,
       sharedSecret: 'staging-shared-secret',

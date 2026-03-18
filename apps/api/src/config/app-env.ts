@@ -47,6 +47,7 @@ export interface AppEnvironment {
   graphqlPath: string;
   port: number;
   webGate: {
+    basicUsername: string;
     sessionSecret: string;
     sessionTtlSeconds: number;
     sharedSecret: string;
@@ -66,6 +67,7 @@ interface BaseEnvironment {
   graphqlPath: string;
   localDatabase: Omit<DatabaseConfig, 'logging' | 'synchronize'>;
   localWebGate: {
+    basicUsername: string;
     sessionSecret: string;
     sharedSecret: string;
   };
@@ -220,6 +222,11 @@ function parseBaseEnvironment(rawEnv: NodeJS.ProcessEnv): BaseEnvironment {
       username: parseString(rawEnv, 'DB_USERNAME', 'postgres'),
     },
     localWebGate: {
+      basicUsername: parseString(
+        rawEnv,
+        'WEB_GATE_BASIC_USERNAME',
+        'deploy-flow'
+      ),
       sessionSecret: parseString(
         rawEnv,
         'WEB_GATE_SESSION_SECRET',
@@ -299,7 +306,6 @@ export function loadEnvironmentFiles(): void {
     }
 
     loadDotenv({
-      override: true,
       path: filePath,
     });
   }
@@ -406,6 +412,7 @@ export async function loadAppEnvironment(
         graphqlPath: baseEnvironment.graphqlPath,
         port: baseEnvironment.port,
         webGate: {
+          basicUsername: baseEnvironment.localWebGate.basicUsername,
           sessionSecret: baseEnvironment.localWebGate.sessionSecret,
           sessionTtlSeconds: baseEnvironment.webGateSessionTtlSeconds,
           sharedSecret: baseEnvironment.localWebGate.sharedSecret,
@@ -435,6 +442,7 @@ export async function loadAppEnvironment(
       graphqlPath: baseEnvironment.graphqlPath,
       port: baseEnvironment.port,
       webGate: {
+        basicUsername: baseEnvironment.localWebGate.basicUsername,
         sessionSecret: ssmParameters[sessionSecretPath],
         sessionTtlSeconds: baseEnvironment.webGateSessionTtlSeconds,
         sharedSecret: ssmParameters[sharedSecretPath],

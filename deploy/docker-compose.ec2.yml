@@ -9,6 +9,7 @@ services:
       AWS_DEFAULT_REGION: ${AWS_REGION}
       AWS_SSM_PARAMETER_PREFIX: ${AWS_SSM_PARAMETER_PREFIX:-/deploy-flow}
       DB_SSL_ROOT_CERT_PATH: ${DB_SSL_ROOT_CERT_PATH:-}
+      WEB_GATE_BASIC_USERNAME: ${WEB_GATE_BASIC_USERNAME:-deploy-flow}
     volumes:
       - ./certs/rds:/run/certs/rds:ro
     logging:
@@ -43,6 +44,7 @@ services:
       - "${NGINX_TLS_PORT:-443}:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./auth:/etc/nginx/auth:ro
       - ./certs/origin.crt:/etc/nginx/certs/origin.crt:ro
       - ./certs/origin.key:/etc/nginx/certs/origin.key:ro
     depends_on:

@@ -27,6 +27,7 @@ describe('createApp', () => {
     graphqlPath: 'graphql',
     port: 3000,
     webGate: {
+      basicUsername: 'deploy-flow',
       sessionSecret: 'session-secret',
       sessionTtlSeconds: 86400,
       sharedSecret: 'shared-secret',
@@ -107,6 +108,13 @@ describe('createApp', () => {
     await apolloServer.stop();
   });
 
+  function buildBasicAuthorizationHeader(
+    username = baseAppEnvironment.webGate.basicUsername,
+    password = baseAppEnvironment.webGate.sharedSecret
+  ): string {
+    return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
+  }
+
   it('returns a healthy status payload', async () => {
     await setup(baseAppEnvironment);
 
@@ -159,10 +167,84 @@ describe('createApp', () => {
       appStage: 'production',
     });
 
-    const openApiResponse = await request(app).get('/api/openapi.json');
-    const swaggerResponse = await request(app).get('/api/docs/');
+    const authHeader = buildBasicAuthorizationHeader();
+    const openApiResponse = await request(app)
+      .get('/api/openapi.json')
+      .set('Authorization', authHeader);
+    const swaggerResponse = await request(app)
+      .get('/api/docs/')
+      .set('Authorization', authHeader);
 
     expect(openApiResponse.status).toBe(404);
     expect(swaggerResponse.status).toBe(404);
+  });
+
+  it('rejects unauthenticated staging GraphQL queries other than health', async () => {
+    await setup({
+      ...baseAppEnvironment,
+      appStage: 'staging',
+    });
+
+    const response = await request(app).post('/api/graphql').send({
+      query: '{ organizations { edges { cursor } } }',
+    });
+
+    expect(response.status).toBe(401);
+    expect(response.headers['www-authenticate']).toContain('Basic');
+    expect(response.body).toEqual({
+      error: 'Unauthorized',
+    });
+  });
+
+  it('allows unauthenticated staging health checks over HTTP and GraphQL', async () => {
+    await setup({
+      ...baseAppEnvironment,
+      appStage: 'staging',
+    });
+
+    const healthResponse = await request(app).get('/api/health');
+    const graphqlHealthResponse = await request(app).post('/api/graphql').send({
+      query: '{ health }',
+    });
+
+    expect(healthResponse.status).toBe(200);
+    expect(graphqlHealthResponse.status).toBe(200);
+    expect(graphqlHealthResponse.body).toEqual({
+      data: {
+        health: 'ok',
+      },
+    });
+  });
+
+  it('allows authenticated staging GraphQL queries and docs', async () => {
+    await setup({
+      ...baseAppEnvironment,
+      appStage: 'staging',
+    });
+
+    const authHeader = buildBasicAuthorizationHeader();
+    const graphqlResponse = await request(app)
+      .post('/api/graphql')
+      .set('Authorization', authHeader)
+      .send({
+        query: '{ organizations { edges { cursor } pageInfo { hasNextPage endCursor } } }',
+      });
+    const docsResponse = await request(app)
+      .get('/api/docs/')
+      .set('Authorization', authHeader);
+
+    expect(graphqlResponse.status).toBe(200);
+    expect(graphqlResponse.body).toEqual({
+      data: {
+        organizations: {
+          edges: [],
+          pageInfo: {
+            endCursor: null,
+            hasNextPage: false,
+          },
+        },
+      },
+    });
+    expect(docsResponse.status).toBe(200);
   });
 });
