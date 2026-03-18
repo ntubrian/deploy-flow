@@ -8,6 +8,7 @@ import {
   CursorConnection,
   applyCursorPagination,
   buildCursorConnection,
+  buildPreciseCursorTimestampSelect,
   decodeCursor,
   normalizeCategoryId,
   normalizeKeyword,
@@ -35,6 +36,10 @@ export class SaleProductRepository {
         OrganizationEntity,
         'organizationFilter',
         'organizationFilter.id = saleProduct.organization_id'
+      )
+      .addSelect(
+        buildPreciseCursorTimestampSelect('saleProduct'),
+        'cursor_created_at'
       )
       .orderBy('saleProduct.created_at', 'DESC')
       .addOrderBy('saleProduct.id', 'DESC')
@@ -70,6 +75,17 @@ export class SaleProductRepository {
       );
     }
 
-    return buildCursorConnection(await queryBuilder.getMany(), pageSize);
+    const { entities, raw } = await queryBuilder.getRawAndEntities();
+
+    return buildCursorConnection(
+      entities.map((entity, index) => ({
+        cursor: {
+          createdAt: raw[index]?.cursor_created_at,
+          id: entity.id,
+        },
+        node: entity,
+      })),
+      pageSize
+    );
   }
 }

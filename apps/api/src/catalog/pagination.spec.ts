@@ -1,5 +1,6 @@
 import {
   buildCursorConnection,
+  buildPreciseCursorTimestampSelect,
   decodeCursor,
   encodeCursor,
   resolvePageSize,
@@ -7,14 +8,13 @@ import {
 
 describe('catalog pagination helpers', () => {
   it('encodes and decodes cursors', () => {
-    const createdAt = new Date('2026-03-17T12:00:00.000Z');
     const cursor = encodeCursor({
-      createdAt,
+      createdAt: '2026-03-17T12:00:00.123456Z',
       id: 'organization-1',
     });
 
     expect(decodeCursor(cursor)).toEqual({
-      createdAt: createdAt.toISOString(),
+      createdAt: '2026-03-17T12:00:00.123456Z',
       id: 'organization-1',
     });
   });
@@ -23,16 +23,31 @@ describe('catalog pagination helpers', () => {
     const connection = buildCursorConnection(
       [
         {
-          createdAt: new Date('2026-03-17T12:00:00.000Z'),
-          id: 'item-3',
+          cursor: {
+            createdAt: '2026-03-17T12:00:00.123456Z',
+            id: 'item-3',
+          },
+          node: {
+            id: 'item-3',
+          },
         },
         {
-          createdAt: new Date('2026-03-17T11:00:00.000Z'),
-          id: 'item-2',
+          cursor: {
+            createdAt: '2026-03-17T11:00:00.123456Z',
+            id: 'item-2',
+          },
+          node: {
+            id: 'item-2',
+          },
         },
         {
-          createdAt: new Date('2026-03-17T10:00:00.000Z'),
-          id: 'item-1',
+          cursor: {
+            createdAt: '2026-03-17T10:00:00.123456Z',
+            id: 'item-1',
+          },
+          node: {
+            id: 'item-1',
+          },
         },
       ],
       2
@@ -45,5 +60,11 @@ describe('catalog pagination helpers', () => {
 
   it('caps page size at the supported maximum', () => {
     expect(resolvePageSize(999)).toBe(50);
+  });
+
+  it('builds a precise timestamp select for database cursors', () => {
+    expect(buildPreciseCursorTimestampSelect('organization')).toBe(
+      `TO_CHAR(organization.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`
+    );
   });
 });

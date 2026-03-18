@@ -11,14 +11,14 @@ export interface CatalogPageArguments {
   keyword?: string | null;
 }
 
-export interface CursorNode {
-  createdAt: Date;
-  id: string;
-}
-
 export interface DecodedCursor {
   createdAt: string;
   id: string;
+}
+
+export interface CursorRecord<TNode> {
+  cursor: DecodedCursor;
+  node: TNode;
 }
 
 export interface ConnectionEdge<TNode> {
@@ -60,11 +60,11 @@ export function resolvePageSize(first?: number | null): number {
   return Math.min(first, MAX_PAGE_SIZE);
 }
 
-export function encodeCursor(node: CursorNode): string {
+export function encodeCursor(cursor: DecodedCursor): string {
   return Buffer.from(
     JSON.stringify({
-      createdAt: node.createdAt.toISOString(),
-      id: node.id,
+      createdAt: cursor.createdAt,
+      id: cursor.id,
     }),
     'utf8'
   ).toString('base64url');
@@ -125,15 +125,15 @@ export function applyCursorPagination<TNode>(
   );
 }
 
-export function buildCursorConnection<TNode extends CursorNode>(
-  nodes: TNode[],
+export function buildCursorConnection<TNode>(
+  records: CursorRecord<TNode>[],
   pageSize: number
 ): CursorConnection<TNode> {
-  const hasNextPage = nodes.length > pageSize;
-  const pagedNodes = hasNextPage ? nodes.slice(0, pageSize) : nodes;
-  const edges = pagedNodes.map((node) => ({
-    cursor: encodeCursor(node),
-    node,
+  const hasNextPage = records.length > pageSize;
+  const pagedRecords = hasNextPage ? records.slice(0, pageSize) : records;
+  const edges = pagedRecords.map((record) => ({
+    cursor: encodeCursor(record.cursor),
+    node: record.node,
   }));
 
   return {
@@ -143,4 +143,8 @@ export function buildCursorConnection<TNode extends CursorNode>(
       hasNextPage,
     },
   };
+}
+
+export function buildPreciseCursorTimestampSelect(alias: string): string {
+  return `TO_CHAR(${alias}.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`;
 }
