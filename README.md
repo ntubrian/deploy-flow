@@ -123,6 +123,17 @@
 - 完成後再改成：`- [x] 任務名稱（YYYY-MM-DD）`
 - 先不要預先打勾；確認完成後再逐項補日期
 
+## Auth 流程測試狀態（2026-03-18）
+
+- [ ] 測 POST /api/auth/access-key 驗證成功
+- [ ] 測 POST /api/auth/access-key 驗證失敗
+- [ ] 測 GET /api/auth/session 未登入回 401
+- [ ] 測 GET /api/auth/session 已登入回成功
+- [x] 測全域 auth guard 會擋住未授權 request（已在 `apps/api/src/server/create-app.spec.ts`）
+- [ ] 測過期 session cookie 會被拒絕
+
+> 目前 `apps/api/src/server/web-gate.ts` 採用 HTTP Basic Auth（`Authorization: Basic ...`），不會在後端 Swagger/API 中自動 set cookie。
+
 ## 最近完成（2026-03-18）
 
 - [x] staging deploy workflow corepack install fallback 修正（2026-03-18）
