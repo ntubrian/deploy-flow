@@ -116,6 +116,7 @@ export function VirtualizedCatalogList<Row>({
   return (
     <div
       className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+      data-testid="catalog-list-scroll"
       ref={scrollElementRef}
       style={{ WebkitOverflowScrolling: 'touch' }}
     >
@@ -142,6 +143,7 @@ export function VirtualizedCatalogList<Row>({
             >
               {isLoaderRow ? (
                 <div className="flex h-full items-center justify-center gap-2 py-4 text-[12px] font-medium text-black/35">
+                  <span data-testid="catalog-fetch-more-loader" />
                   <CatalogSpinner className="h-4 w-4" />
                   <span>{isFetchingMore ? '載入中...' : '繼續滑動載入更多'}</span>
                 </div>

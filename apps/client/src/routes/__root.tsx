@@ -1,8 +1,12 @@
-import { ApolloProvider } from '@apollo/client/react'
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import {
+  Asset,
+  Scripts,
+  createRootRoute,
+  useRouter,
+  useTags,
+} from '@tanstack/react-router'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 
-import { apolloClient } from '../lib/graphql/apollo-client'
 import '../styles/app.css'
 
 export const Route = createRootRoute({
@@ -26,15 +30,38 @@ export const Route = createRootRoute({
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-Hant">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <NuqsAdapter>
-          <ApolloProvider client={apolloClient}>{children}</ApolloProvider>
-        </NuqsAdapter>
-        <Scripts />
-      </body>
+      <head suppressHydrationWarning><RootHeadContent /></head>
+      <body suppressHydrationWarning><NuqsAdapter>{children}</NuqsAdapter><Scripts /></body>
     </html>
+  )
+}
+
+function RootHeadContent() {
+  const tags = useTags()
+  const router = useRouter()
+  const nonce = router.options.ssr?.nonce
+
+  return (
+    <>
+      {tags
+        .filter((tag) => {
+          if (tag.tag !== 'link') {
+            return true
+          }
+
+          const href =
+            typeof tag.attrs?.href === 'string' ? tag.attrs.href : undefined
+          const rel =
+            typeof tag.attrs?.rel === 'string' ? tag.attrs.rel : undefined
+
+          return !(
+            href?.startsWith('/assets/') &&
+            (rel === 'stylesheet' || rel === 'modulepreload')
+          )
+        })
+        .map((tag) => (
+          <Asset {...tag} key={`tsr-meta-${JSON.stringify(tag)}`} nonce={nonce} />
+        ))}
+    </>
   )
 }

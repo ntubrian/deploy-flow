@@ -1,0 +1,12 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "files": ["./support/commands.d.ts"],
+  "compilerOptions": {
+    "outDir": "out-tsc/cypress",
+    "allowJs": true,
+    "types": ["cypress", "node"],
+    "sourceMap": false
+  },
+  "include": ["**/*.ts", "**/*.js", "**/*.d.ts"],
+  "exclude": ["out-tsc", "test-output", "eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"]
+}

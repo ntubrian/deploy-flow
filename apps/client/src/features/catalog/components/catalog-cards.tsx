@@ -67,12 +67,17 @@ export function OrganizationCard({
 }: {
   item: CatalogOrganizationListItemFragment
 }) {
+  const logo = item.logo
+
   return (
-    <article className="flex h-[84px] items-center gap-3 rounded-[12px] bg-white px-3 py-[9px]">
+    <article
+      className="flex h-[84px] items-center gap-3 rounded-[12px] bg-white px-3 py-[9px]"
+      data-testid={`organization-card-${item.id}`}
+    >
       <CardImage
-        alt={item.logo.altText}
+        alt={logo?.altText ?? `${item.name} logo`}
         className="h-[60px] w-[60px] rounded-[6px] border border-black/10 object-cover"
-        src={item.logo.url}
+        src={logo?.url ?? ''}
       />
       <div className="min-w-0 flex-1">
         <h2 className="line-clamp-1 text-[16px] font-semibold leading-6 text-[#171718]">
@@ -91,16 +96,26 @@ export function DonationProjectCard({
 }: {
   item: CatalogDonationProjectListItemFragment
 }) {
+  const cover = item.cover
+  const categoryNames = (item.categories ?? [])
+    .filter((category): category is NonNullable<typeof category> => Boolean(category))
+    .slice(0, 3)
+    .map((category) => category.name)
+  const organizationName = item.organization?.name ?? ''
+
   return (
-    <article className="overflow-hidden rounded-[12px] bg-white">
+    <article
+      className="overflow-hidden rounded-[12px] bg-white"
+      data-testid={`donation-project-card-${item.id}`}
+    >
       <CardImage
-        alt={item.cover.altText}
+        alt={cover?.altText ?? `${item.title} cover`}
         className="h-[168px] w-full object-cover"
-        src={item.cover.url}
+        src={cover?.url ?? ''}
       />
       <div className="px-3 pb-4 pt-2.5">
         <p className="text-[11px] font-semibold tracking-[0.01em] text-[#d5191d]">
-          {item.organization.name}
+          {organizationName}
         </p>
         <h2 className="mt-1 line-clamp-2 text-[18px] font-semibold leading-6 text-[#171718]">
           {item.title}
@@ -108,10 +123,7 @@ export function DonationProjectCard({
         <div className="mt-2 flex items-start gap-1.5 text-[11px] text-black/30">
           <CategoryTagIcon />
           <p className="line-clamp-1 min-w-0 leading-[1.45]">
-            {item.categories
-              .slice(0, 3)
-              .map((category) => category.name)
-              .join('・')}
+            {categoryNames.join('・')}
           </p>
         </div>
       </div>
@@ -124,19 +136,25 @@ export function SaleProductCard({
 }: {
   item: CatalogSaleProductListItemFragment
 }) {
+  const cover = item.cover
+  const organizationName = item.organization?.name ?? ''
+
   return (
-    <article className="overflow-hidden rounded-[12px] bg-white">
+    <article
+      className="overflow-hidden rounded-[12px] bg-white"
+      data-testid={`sale-product-card-${item.id}`}
+    >
       <CardImage
-        alt={item.cover.altText}
+        alt={cover?.altText ?? `${item.title} cover`}
         className="h-[108px] w-full object-cover"
-        src={item.cover.url}
+        src={cover?.url ?? ''}
       />
       <div className="px-2.5 pb-3 pt-2">
         <h2 className="line-clamp-2 min-h-[40px] text-[14px] font-semibold leading-5 text-[#171718]">
           {item.title}
         </h2>
         <p className="mt-1 line-clamp-1 text-[11px] leading-4 text-black/45">
-          {item.organization.name}
+          {organizationName}
         </p>
         <p className="mt-3 text-[13px] font-bold leading-none text-[#d5191d]">
           {formatTwdPrice(item.priceAmount)}

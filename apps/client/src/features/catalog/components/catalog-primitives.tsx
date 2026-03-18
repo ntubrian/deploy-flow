@@ -14,7 +14,10 @@ export function CatalogMobileShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className="min-h-dvh bg-[#dcdcdc] md:p-6">
+    <main
+      className="min-h-dvh bg-[#dcdcdc] md:p-6"
+      data-testid="catalog-page"
+    >
       <div className="mx-auto flex h-dvh min-h-dvh w-full max-w-[375px] flex-col overflow-hidden bg-[#f4f4f6] md:h-[812px] md:min-h-[812px] md:rounded-[28px]">
         {children}
       </div>
@@ -61,7 +64,7 @@ export function CatalogTabs({
   );
 
   return (
-    <nav className="border-b border-black/5 bg-white">
+    <nav className="border-b border-black/5 bg-white" data-testid="catalog-tabs">
       <div className="relative">
         <ul className="flex">
           {tabs.map((tab) => {
@@ -70,9 +73,11 @@ export function CatalogTabs({
             return (
               <li className="min-w-0 flex-1" key={tab.key}>
                 <button
+                  aria-pressed={isActive}
                   className={`relative flex h-[46px] w-full items-end justify-center pb-[10px] font-medium transition-colors ${
                     isActive ? 'text-[16px] text-[#171718]' : 'text-[14px] text-black/45'
                   }`}
+                  data-testid={`catalog-tab-${tab.key}`}
                   onClick={() => onChange(tab.key)}
                   type="button"
                 >
@@ -109,6 +114,7 @@ export function CatalogCompactControls({
     <div className="flex items-center gap-2.5 bg-[#f4f4f6] px-[15px] py-3">
       <button
         className="inline-flex h-[30px] shrink-0 items-center gap-1 rounded-md bg-[#ededf1] px-3 text-[13px] font-medium text-black/70"
+        data-testid="catalog-open-category"
         onClick={onOpenCategoryModal}
         type="button"
       >
@@ -118,6 +124,7 @@ export function CatalogCompactControls({
       <button
         aria-label="開啟搜尋"
         className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#ededf1] text-black/45"
+        data-testid="catalog-open-search"
         onClick={onOpenSearch}
         type="button"
       >
@@ -144,6 +151,7 @@ export function CatalogExpandedSearchBar({
         <Search className="h-4 w-4 shrink-0" strokeWidth={2.2} />
         <input
           className="min-w-0 flex-1 bg-transparent text-[14px] leading-none text-black outline-none placeholder:text-black/30"
+          data-testid="catalog-search-input"
           onChange={(event) => onChange(event.target.value)}
           placeholder="搜尋"
           ref={inputRef}
@@ -152,6 +160,7 @@ export function CatalogExpandedSearchBar({
       </label>
       <button
         className="shrink-0 text-[15px] font-medium text-[#007aff]"
+        data-testid="catalog-search-cancel"
         onClick={onCancel}
         type="button"
       >
@@ -163,7 +172,10 @@ export function CatalogExpandedSearchBar({
 
 export function CatalogEmptyState() {
   return (
-    <div className="flex min-h-[420px] flex-col items-center justify-center px-7 pb-16 pt-10 text-center">
+    <div
+      className="flex min-h-[420px] flex-col items-center justify-center px-7 pb-16 pt-10 text-center"
+      data-testid="catalog-empty-state"
+    >
       <img
         alt=""
         aria-hidden="true"
@@ -191,7 +203,10 @@ export function CatalogSpinner({ className = '' }: { className?: string }) {
 
 export function CatalogSearchLoadingState() {
   return (
-    <div className="flex min-h-[420px] items-center justify-center">
+    <div
+      className="flex min-h-[420px] items-center justify-center"
+      data-testid="catalog-search-loading"
+    >
       <CatalogSpinner className="h-6 w-6" />
     </div>
   );
@@ -199,7 +214,7 @@ export function CatalogSearchLoadingState() {
 
 export function CatalogErrorState({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="px-[15px] py-10">
+    <div className="px-[15px] py-10" data-testid="catalog-error-state">
       <div className="rounded-2xl bg-white px-5 py-6 text-center">
         <p className="text-[17px] font-semibold text-[#171718]">資料載入失敗</p>
         <p className="mt-2 text-[13px] leading-6 text-black/45">
@@ -207,6 +222,7 @@ export function CatalogErrorState({ onRetry }: { onRetry: () => void }) {
         </p>
         <button
           className="mt-4 inline-flex h-10 items-center justify-center rounded-full bg-[#c9191d] px-5 text-[14px] font-semibold text-white"
+          data-testid="catalog-error-retry"
           onClick={onRetry}
           type="button"
         >
@@ -245,6 +261,7 @@ export function CatalogCategoryModal({
       className={`fixed inset-0 z-40 flex items-end justify-center bg-black/50 transition-opacity duration-200 ease-out md:px-6 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
+      data-testid="catalog-category-modal-overlay"
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
@@ -256,12 +273,16 @@ export function CatalogCategoryModal({
         className={`w-full max-w-[375px] rounded-t-[24px] bg-white px-4 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-5 transition-all duration-200 ease-out ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'
         }`}
+        aria-modal="true"
+        data-testid="catalog-category-modal"
+        role="dialog"
       >
         <div className="relative flex items-center justify-center">
           <h2 className="text-[17px] font-semibold text-[#171718]">選擇類別</h2>
           <button
             aria-label="關閉類別選單"
             className="absolute right-0 inline-flex h-8 w-8 items-center justify-center text-black/35"
+            data-testid="catalog-category-close"
             onClick={onClose}
             type="button"
           >
@@ -275,11 +296,13 @@ export function CatalogCategoryModal({
 
             return (
               <button
+                aria-pressed={isSelected}
                 className={`flex h-[36px] items-center justify-center rounded-[8px] border text-[13px] font-medium transition-colors ${
                   isSelected
                     ? 'border-[#d5191d] bg-white text-[#d5191d]'
                     : 'border-transparent bg-[#f4f4f6] text-[#171718]'
                 }`}
+                data-testid={`catalog-category-option-${category.id ?? 'all'}`}
                 key={category.id ?? 'all'}
                 onClick={() => onSelect(category.id)}
                 type="button"

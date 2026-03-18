@@ -48,6 +48,7 @@ import {
 
 interface CatalogSectionProps {
   categoryId: string | null
+  enabled: boolean
   keyword: string
   searchVisible: boolean
 }
@@ -69,6 +70,7 @@ function buildConnectionVariables(
 
 function OrganizationsSection({
   categoryId,
+  enabled,
   keyword,
   searchVisible,
 }: CatalogSectionProps) {
@@ -76,12 +78,17 @@ function OrganizationsSection({
   const { data, error, fetchMore, loading, networkStatus, refetch } =
     useCatalogOrganizationsQuery({
       notifyOnNetworkStatusChange: true,
+      skip: !enabled,
       variables,
     })
   const connection = data?.organizations
   const items = connection?.edges.map((edge) => edge.node) ?? []
 
   async function loadMore() {
+    if (!enabled) {
+      return
+    }
+
     if (
       !connection?.pageInfo.endCursor ||
       !connection.pageInfo.hasNextPage ||
@@ -108,14 +115,16 @@ function OrganizationsSection({
       emptyState={undefined}
       estimateSize={96}
       footer={!connection?.pageInfo.hasNextPage ? <CatalogListFooter /> : undefined}
-      hasError={Boolean(error)}
-      hasNextPage={connection?.pageInfo.hasNextPage ?? false}
+      hasError={enabled && Boolean(error)}
+      hasNextPage={enabled ? (connection?.pageInfo.hasNextPage ?? false) : false}
       isFetchingMore={networkStatus === NetworkStatus.fetchMore}
-      isInitialLoading={loading && items.length === 0}
-      loadingMode={searchVisible && Boolean(keyword) ? 'spinner' : 'skeleton'}
+      isInitialLoading={!enabled || (loading && items.length === 0)}
+      loadingMode={enabled && searchVisible && Boolean(keyword) ? 'spinner' : 'skeleton'}
       onLoadMore={loadMore}
       onRetry={() => {
-        void refetch(variables)
+        if (enabled) {
+          void refetch(variables)
+        }
       }}
       renderRow={(item) => <OrganizationCard item={item} />}
       renderSkeletonRow={(index) => <OrganizationCardSkeleton key={index} />}
@@ -127,6 +136,7 @@ function OrganizationsSection({
 
 function DonationProjectsSection({
   categoryId,
+  enabled,
   keyword,
   searchVisible,
 }: CatalogSectionProps) {
@@ -134,12 +144,17 @@ function DonationProjectsSection({
   const { data, error, fetchMore, loading, networkStatus, refetch } =
     useCatalogDonationProjectsQuery({
       notifyOnNetworkStatusChange: true,
+      skip: !enabled,
       variables,
     })
   const connection = data?.donationProjects
   const items = connection?.edges.map((edge) => edge.node) ?? []
 
   async function loadMore() {
+    if (!enabled) {
+      return
+    }
+
     if (
       !connection?.pageInfo.endCursor ||
       !connection.pageInfo.hasNextPage ||
@@ -165,14 +180,16 @@ function DonationProjectsSection({
     <VirtualizedCatalogList<CatalogDonationProjectListItemFragment>
       estimateSize={276}
       footer={!connection?.pageInfo.hasNextPage ? <CatalogListFooter /> : undefined}
-      hasError={Boolean(error)}
-      hasNextPage={connection?.pageInfo.hasNextPage ?? false}
+      hasError={enabled && Boolean(error)}
+      hasNextPage={enabled ? (connection?.pageInfo.hasNextPage ?? false) : false}
       isFetchingMore={networkStatus === NetworkStatus.fetchMore}
-      isInitialLoading={loading && items.length === 0}
-      loadingMode={searchVisible && Boolean(keyword) ? 'spinner' : 'skeleton'}
+      isInitialLoading={!enabled || (loading && items.length === 0)}
+      loadingMode={enabled && searchVisible && Boolean(keyword) ? 'spinner' : 'skeleton'}
       onLoadMore={loadMore}
       onRetry={() => {
-        void refetch(variables)
+        if (enabled) {
+          void refetch(variables)
+        }
       }}
       rowClassName="pb-3"
       renderRow={(item) => <DonationProjectCard item={item} />}
@@ -187,6 +204,7 @@ function DonationProjectsSection({
 
 function SaleProductsSection({
   categoryId,
+  enabled,
   keyword,
   searchVisible,
 }: CatalogSectionProps) {
@@ -194,6 +212,7 @@ function SaleProductsSection({
   const { data, error, fetchMore, loading, networkStatus, refetch } =
     useCatalogSaleProductsQuery({
       notifyOnNetworkStatusChange: true,
+      skip: !enabled,
       variables,
     })
   const connection = data?.saleProducts
@@ -201,6 +220,10 @@ function SaleProductsSection({
   const rows = chunkSaleProductRows(items)
 
   async function loadMore() {
+    if (!enabled) {
+      return
+    }
+
     if (
       !connection?.pageInfo.endCursor ||
       !connection.pageInfo.hasNextPage ||
@@ -226,14 +249,16 @@ function SaleProductsSection({
     <VirtualizedCatalogList<CatalogSaleProductListItemFragment[]>
       estimateSize={226}
       footer={!connection?.pageInfo.hasNextPage ? <CatalogListFooter /> : undefined}
-      hasError={Boolean(error)}
-      hasNextPage={connection?.pageInfo.hasNextPage ?? false}
+      hasError={enabled && Boolean(error)}
+      hasNextPage={enabled ? (connection?.pageInfo.hasNextPage ?? false) : false}
       isFetchingMore={networkStatus === NetworkStatus.fetchMore}
-      isInitialLoading={loading && rows.length === 0}
-      loadingMode={searchVisible && Boolean(keyword) ? 'spinner' : 'skeleton'}
+      isInitialLoading={!enabled || (loading && rows.length === 0)}
+      loadingMode={enabled && searchVisible && Boolean(keyword) ? 'spinner' : 'skeleton'}
       onLoadMore={loadMore}
       onRetry={() => {
-        void refetch(variables)
+        if (enabled) {
+          void refetch(variables)
+        }
       }}
       renderRow={(row) => (
         <div className="grid grid-cols-2 gap-x-3">
@@ -273,9 +298,11 @@ export function CatalogPage() {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const categoryCloseTimeoutRef = useRef<number | null>(null)
   const categoryUnmountTimeoutRef = useRef<number | null>(null)
+  const [isClientReady, setIsClientReady] = useState(false)
   const [debouncedKeyword] = useDebounce(keywordInput, 250)
   const categoriesQuery = useCatalogCategoriesQuery({
     fetchPolicy: 'cache-first',
+    skip: !isClientReady,
   })
   const categories = categoriesQuery.data?.categories ?? []
   const searchVisible = isSearchOpen || keywordInput.length > 0
@@ -288,6 +315,10 @@ export function CatalogPage() {
   ]
   const selectedCategoryLabel =
     categories.find((category) => category.id === selectedCategoryId)?.name ?? '全部'
+
+  useEffect(() => {
+    setIsClientReady(true)
+  }, [])
 
   useEffect(() => {
     if (searchVisible) {
@@ -376,6 +407,7 @@ export function CatalogPage() {
     section = (
       <OrganizationsSection
         categoryId={selectedCategoryId}
+        enabled={isClientReady}
         keyword={debouncedKeyword}
         searchVisible={searchVisible}
       />
@@ -384,6 +416,7 @@ export function CatalogPage() {
     section = (
       <DonationProjectsSection
         categoryId={selectedCategoryId}
+        enabled={isClientReady}
         keyword={debouncedKeyword}
         searchVisible={searchVisible}
       />
@@ -392,6 +425,7 @@ export function CatalogPage() {
     section = (
       <SaleProductsSection
         categoryId={selectedCategoryId}
+        enabled={isClientReady}
         keyword={debouncedKeyword}
         searchVisible={searchVisible}
       />
