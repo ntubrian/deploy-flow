@@ -132,7 +132,9 @@ jobs:
               "sudo -u ec2-user git checkout staging",
               "sudo -u ec2-user git pull --ff-only origin staging",
               "if ! command -v node >/dev/null 2>&1; then echo 'Node.js is required on the staging host to run migrations' >&2; exit 1; fi",
-              "if ! command -v corepack >/dev/null 2>&1; then echo 'corepack not found; installing corepack via npm' >&2; npm install -g corepack; fi",
+              "if ! command -v corepack >/dev/null 2>&1; then echo 'corepack not found; installing corepack via npm --force' >&2; npm install -g corepack --force; fi",
+              "if ! command -v corepack >/dev/null 2>&1; then echo 'corepack still not found, attempting fallback by symlink pnpm path to corepack' >&2; \
+               if command -v pnpm >/dev/null 2>&1; then mkdir -p /usr/local/bin && ln -sf $(command -v pnpm) /usr/local/bin/corepack; fi; fi",
               "if ! command -v corepack >/dev/null 2>&1; then echo 'corepack is required on the staging host to manage pnpm' >&2; exit 1; fi",
               "node -e \"const [major, minor] = process.versions.node.split('.').map(Number); if (major < 20 || (major === 20 && minor < 19)) { console.error('Node.js >= 20.19.0 is required on the staging host'); process.exit(1); }\"",
               "if ! command -v openssl >/dev/null 2>&1; then echo 'openssl is required on the staging host to generate nginx basic auth credentials' >&2; exit 1; fi",
