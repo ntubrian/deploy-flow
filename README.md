@@ -112,80 +112,87 @@
 - [ ] 建立未驗證前阻擋 catalog query 的規則
 - [ ] 建立驗證失敗提示文案
 
+### GraphQL Client
+
+- [x] 建立 Apollo GraphQL client（2026-03-18）
+- [x] 設定 ApolloProvider 掛到前端 root route（2026-03-18）
+- [x] 設定 GraphQL client 預設帶 `credentials: 'include'`（2026-03-18）
+- [x] 建立前端 catalog query documents（2026-03-18）
+
 ### 頁面骨架
 
-- [ ] 建立 donation catalog 頁面路由
-- [ ] 建立頁面外層 layout
-- [ ] 建立頁首標題區塊
-- [ ] 建立三個 tab 切換區塊
-- [ ] 建立 tab active state 樣式
-- [ ] 建立 tab 切換事件與狀態管理
+- [x] 建立 donation catalog 頁面路由（2026-03-18）
+- [x] 建立頁面外層 layout（2026-03-18）
+- [x] 建立頁首標題區塊（2026-03-18）
+- [x] 建立三個 tab 切換區塊（2026-03-18）
+- [x] 建立 tab active state 樣式（2026-03-18）
+- [x] 建立 tab 切換事件與狀態管理（2026-03-18）
 
 ### 搜尋與篩選 UI
 
-- [ ] 建立搜尋輸入框元件
-- [ ] 建立搜尋 icon 按鈕
-- [ ] 建立搜尋 placeholder 文案
-- [ ] 建立搜尋輸入狀態
-- [ ] 建立搜尋 debounce
-- [ ] 建立搜尋清空行為
-- [ ] 建立搜尋送出後重置分頁行為
-- [ ] 建立類別篩選 trigger
-- [ ] 建立所有類別 modal 容器
-- [ ] 建立 modal header
-- [ ] 建立 modal 關閉按鈕
-- [ ] 建立類別 chip/button 元件
-- [ ] 建立類別選取 active state
-- [ ] 建立類別切換後重置分頁行為
-- [ ] 建立 modal 關閉後保留目前篩選狀態
+- [x] 建立搜尋輸入框元件（2026-03-18）
+- [x] 建立搜尋 icon 按鈕（2026-03-18）
+- [x] 建立搜尋 placeholder 文案（2026-03-18）
+- [x] 建立搜尋輸入狀態（2026-03-18）
+- [x] 建立搜尋 debounce（2026-03-18）
+- [x] 建立搜尋清空行為（2026-03-18）
+- [x] 建立搜尋送出後重置分頁行為（2026-03-18）
+- [x] 建立類別篩選 trigger（2026-03-18）
+- [x] 建立所有類別 modal 容器（2026-03-18）
+- [x] 建立 modal header（2026-03-18）
+- [x] 建立 modal 關閉按鈕（2026-03-18）
+- [x] 建立類別 chip/button 元件（2026-03-18）
+- [x] 建立類別選取 active state（2026-03-18）
+- [x] 建立類別切換後重置分頁行為（2026-03-18）
+- [x] 建立 modal 關閉後保留目前篩選狀態（2026-03-18）
 
 ### 公益團體列表
 
-- [ ] 建立公益團體卡元件
-- [ ] 顯示團體 logo
-- [ ] 顯示團體名稱
-- [ ] 顯示團體簡介
-- [ ] 建立公益團體列表容器
-- [ ] 串接公益團體 query
-- [ ] 套用公益團體 keyword 搜尋
-- [ ] 套用公益團體 category 篩選
-- [ ] 套用公益團體 infinite scroll
+- [x] 建立公益團體卡元件（2026-03-18）
+- [x] 顯示團體 logo（2026-03-18）
+- [x] 顯示團體名稱（2026-03-18）
+- [x] 顯示團體簡介（2026-03-18）
+- [x] 建立公益團體列表容器（2026-03-18）
+- [x] 串接公益團體 query（2026-03-18）
+- [x] 套用公益團體 keyword 搜尋（2026-03-18）
+- [x] 套用公益團體 category 篩選（2026-03-18）
+- [x] 套用公益團體 infinite scroll（2026-03-18）
 
 ### 捐款專案列表
 
-- [ ] 建立捐款專案卡元件
-- [ ] 顯示專案封面圖
-- [ ] 顯示所屬團體名稱
-- [ ] 顯示專案標題
-- [ ] 顯示專案類別 tags
-- [ ] 建立捐款專案列表容器
-- [ ] 串接捐款專案 query
-- [ ] 套用捐款專案 keyword 搜尋
-- [ ] 套用捐款專案 category 篩選
-- [ ] 套用捐款專案 infinite scroll
+- [x] 建立捐款專案卡元件（2026-03-18）
+- [x] 顯示專案封面圖（2026-03-18）
+- [x] 顯示所屬團體名稱（2026-03-18）
+- [x] 顯示專案標題（2026-03-18）
+- [x] 顯示專案類別 tags（2026-03-18）
+- [x] 建立捐款專案列表容器（2026-03-18）
+- [x] 串接捐款專案 query（2026-03-18）
+- [x] 套用捐款專案 keyword 搜尋（2026-03-18）
+- [x] 套用捐款專案 category 篩選（2026-03-18）
+- [x] 套用捐款專案 infinite scroll（2026-03-18）
 
 ### 義賣商品列表
 
-- [ ] 建立義賣商品卡元件
-- [ ] 顯示商品封面圖
-- [ ] 顯示所屬團體名稱
-- [ ] 顯示商品名稱
-- [ ] 顯示商品價格
-- [ ] 建立義賣商品列表容器
-- [ ] 串接義賣商品 query
-- [ ] 套用義賣商品 keyword 搜尋
-- [ ] 套用義賣商品 category 篩選
-- [ ] 套用義賣商品 infinite scroll
+- [x] 建立義賣商品卡元件（2026-03-18）
+- [x] 顯示商品封面圖（2026-03-18）
+- [x] 顯示所屬團體名稱（2026-03-18）
+- [x] 顯示商品名稱（2026-03-18）
+- [x] 顯示商品價格（2026-03-18）
+- [x] 建立義賣商品列表容器（2026-03-18）
+- [x] 串接義賣商品 query（2026-03-18）
+- [x] 套用義賣商品 keyword 搜尋（2026-03-18）
+- [x] 套用義賣商品 category 篩選（2026-03-18）
+- [x] 套用義賣商品 infinite scroll（2026-03-18）
 
 ### 共用狀態處理
 
-- [ ] 建立搜尋中 loading UI
-- [ ] 建立列表初次載入 loading UI
-- [ ] 建立載入更多 loading UI
-- [ ] 建立搜尋無結果 UI
-- [ ] 建立 API error UI
+- [x] 建立搜尋中 loading UI（2026-03-18）
+- [x] 建立列表初次載入 loading UI（2026-03-18）
+- [x] 建立載入更多 loading UI（2026-03-18）
+- [x] 建立搜尋無結果 UI（2026-03-18）
+- [x] 建立 API error UI（2026-03-18）
 - [ ] 建立 tab 切換時的資料重置規則
-- [ ] 建立 keyword 與 category 同步查詢規則
+- [x] 建立 keyword 與 category 同步查詢規則（2026-03-18）
 
 ### 前端測試
 
@@ -223,6 +230,7 @@
 - [x] 設定 staging API 透過 SSM 讀取 database 與 web gate secrets（2026-03-17）
 - [x] 設定 staging RDS CA bundle 掛載到 API container（2026-03-17）
 - [x] 設定 staging `api` / `client` / `nginx` logs 送到 CloudWatch Logs（2026-03-17）
+- [x] 設定 staging deploy 先執行 migration 再更新 container（2026-03-18）
 - [x] 驗證 staging `/api/health` 可用（2026-03-17）
 - [x] 驗證 staging `/api/graphql` 可載入 Apollo Sandbox（2026-03-17）
 
@@ -265,74 +273,65 @@
 
 ### Migration / Seed
 
-- [x] 建立初始 migration（2026-03-17）
+- [x] 建立初始 migration（2026-03-18）
 - [x] 建立 migration 執行指令（2026-03-17）
 - [x] 建立 migration rollback 指令（2026-03-17）
-- [x] 建立 categories seed（2026-03-17）
-- [x] 建立 organizations seed（2026-03-17）
-- [x] 建立 donation projects seed（2026-03-17）
-- [x] 建立 sale products seed（2026-03-17）
-- [x] 建立 asset seed（2026-03-17）
-- [x] 建立 organization_categories seed（2026-03-17）
-- [x] 建立 project_categories seed（2026-03-17）
-- [x] 建立 product_categories seed（2026-03-17）
+- [x] 建立 categories seed（2026-03-18）
+- [x] 建立 organizations seed（2026-03-18）
+- [x] 建立 donation projects seed（2026-03-18）
+- [x] 建立 sale products seed（2026-03-18）
+- [x] 建立 asset seed（2026-03-18）
+- [x] 建立 organization_categories seed（2026-03-18）
+- [x] 建立 project_categories seed（2026-03-18）
+- [x] 建立 product_categories seed（2026-03-18）
 - [x] 建立 seed 執行指令（2026-03-17）
 - [ ] 驗證 seed 後三個 tab 都有資料
 
 ### Repository Pattern
 
-- [ ] 建立 `OrganizationRepository` interface
-- [ ] 建立 `DonationProjectRepository` interface
-- [ ] 建立 `SaleProductRepository` interface
-- [ ] 建立 `CategoryRepository` interface
-- [ ] 建立 `OrganizationListRepository` interface
-- [ ] 建立 `DonationProjectListRepository` interface
-- [ ] 建立 `SaleProductListRepository` interface
-- [ ] 建立 TypeORM `OrganizationRepository` implementation
-- [ ] 建立 TypeORM `DonationProjectRepository` implementation
-- [ ] 建立 TypeORM `SaleProductRepository` implementation
-- [ ] 建立 TypeORM `CategoryRepository` implementation
-- [ ] 建立 TypeORM `OrganizationListRepository` implementation
-- [ ] 建立 TypeORM `DonationProjectListRepository` implementation
-- [ ] 建立 TypeORM `SaleProductListRepository` implementation
+- [x] 建立 TypeORM `AssetRepository` implementation（2026-03-18）
+- [x] 建立 TypeORM `CategoryRepository` implementation（2026-03-18）
+- [x] 建立 TypeORM `OrganizationRepository` implementation（2026-03-18）
+- [x] 建立 TypeORM `DonationProjectRepository` implementation（2026-03-18）
+- [x] 建立 TypeORM `SaleProductRepository` implementation（2026-03-18）
+- [x] 建立 request-scoped catalog DataLoader（2026-03-18）
 
 ### Query 邏輯
 
 - 所有列表 pagination 一律採用 cursor-based pagination strategy
 
-- [ ] 實作公益團體 keyword 搜尋
-- [ ] 實作公益團體 category 篩選
-- [ ] 實作公益團體 cursor pagination
-- [ ] 實作捐款專案 keyword 搜尋
-- [ ] 實作捐款專案 category 篩選
-- [ ] 實作捐款專案 cursor pagination
-- [ ] 實作捐款專案 tags 載入
-- [ ] 實作義賣商品 keyword 搜尋
-- [ ] 實作義賣商品 category 篩選
-- [ ] 實作義賣商品 cursor pagination
-- [ ] 實作義賣商品 categories 載入
-- [ ] 實作義賣商品 price 欄位返回
-- [ ] 實作 categories 排序查詢
+- [x] 實作公益團體 keyword 搜尋（2026-03-18）
+- [x] 實作公益團體 category 篩選（2026-03-18）
+- [x] 實作公益團體 cursor pagination（2026-03-18）
+- [x] 實作捐款專案 keyword 搜尋（2026-03-18）
+- [x] 實作捐款專案 category 篩選（2026-03-18）
+- [x] 實作捐款專案 cursor pagination（2026-03-18）
+- [x] 實作捐款專案 categories 載入（2026-03-18）
+- [x] 實作義賣商品 keyword 搜尋（2026-03-18）
+- [x] 實作義賣商品 category 篩選（2026-03-18）
+- [x] 實作義賣商品 cursor pagination（2026-03-18）
+- [x] 實作義賣商品 categories 載入（2026-03-18）
+- [x] 實作義賣商品 price 欄位返回（2026-03-18）
+- [x] 實作 categories 排序查詢（2026-03-18）
 
 ### GraphQL Schema / Resolver
 
-- [ ] 建立 `Asset` GraphQL type
-- [ ] 建立 `Category` GraphQL type
-- [ ] 建立 `Organization` GraphQL type
-- [ ] 建立 `DonationProject` GraphQL type
-- [ ] 建立 `SaleProduct` GraphQL type
-- [ ] 建立 `PageInfo` GraphQL type
-- [ ] 建立 `OrganizationConnection` type
-- [ ] 建立 `DonationProjectConnection` type
-- [ ] 建立 `SaleProductConnection` type
-- [ ] 建立 `OrganizationListInput`
-- [ ] 建立 `DonationProjectListInput`
-- [ ] 建立 `SaleProductListInput`
-- [ ] 建立 `PageInput`
-- [ ] 建立 `OrganizationResolver`
-- [ ] 建立 `DonationProjectResolver`
-- [ ] 建立 `SaleProductResolver`
-- [ ] 建立 `CategoryResolver`
+- [x] 建立 code-first GraphQL schema 建構流程（2026-03-18）
+- [x] 自動產出 `graphql/schema.graphql`（2026-03-18）
+- [x] 建立 `Asset` GraphQL type（2026-03-18）
+- [x] 建立 `Category` GraphQL type（2026-03-18）
+- [x] 建立 `Organization` GraphQL type（2026-03-18）
+- [x] 建立 `DonationProject` GraphQL type（2026-03-18）
+- [x] 建立 `SaleProduct` GraphQL type（2026-03-18）
+- [x] 建立 `PageInfo` GraphQL type（2026-03-18）
+- [x] 建立 `OrganizationConnection` type（2026-03-18）
+- [x] 建立 `DonationProjectConnection` type（2026-03-18）
+- [x] 建立 `SaleProductConnection` type（2026-03-18）
+- [x] 建立 `CatalogConnectionArgs`（2026-03-18）
+- [x] 建立 catalog query resolver（2026-03-18）
+- [x] 建立 `OrganizationResolver`（2026-03-18）
+- [x] 建立 `DonationProjectResolver`（2026-03-18）
+- [x] 建立 `SaleProductResolver`（2026-03-18）
 
 ### 後端測試
 
@@ -342,22 +341,11 @@
 - [ ] 測 `GET /api/auth/session` 已登入回成功
 - [ ] 測全域 auth guard 會擋住未授權 request
 - [ ] 測過期 session cookie 會被拒絕
-- [ ] 測 `OrganizationListRepository` keyword filter
-- [ ] 測 `OrganizationListRepository` category filter
-- [ ] 測 `OrganizationListRepository` cursor pagination
-- [ ] 測 `DonationProjectListRepository` keyword filter
-- [ ] 測 `DonationProjectListRepository` category filter
-- [ ] 測 `DonationProjectListRepository` tags mapping
-- [ ] 測 `DonationProjectListRepository` cursor pagination
-- [ ] 測 `SaleProductListRepository` keyword filter
-- [ ] 測 `SaleProductListRepository` category filter
-- [ ] 測 `SaleProductListRepository` categories mapping
-- [ ] 測 `SaleProductListRepository` price mapping
-- [ ] 測 `SaleProductListRepository` cursor pagination
-- [ ] 測 `CategoryResolver` 回傳排序正確
-- [ ] 測 `OrganizationResolver` input / output
-- [ ] 測 `DonationProjectResolver` input / output
-- [ ] 測 `SaleProductResolver` input / output
+- [x] 測 cursor pagination helper（2026-03-18）
+- [x] 測 catalog DataLoader 映射（2026-03-18）
+- [x] 測 catalog query resolver input / output（2026-03-18）
+- [x] 測 code-first schema 產出內容（2026-03-18）
+- [x] 測 field resolvers 透過 DataLoader 取值（2026-03-18）
 - [ ] 測 seed 後 query 可正常回資料
 
 ## Nx 常用指令

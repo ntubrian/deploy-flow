@@ -8,6 +8,7 @@
     "dev:client": "pnpm nx dev @deploy-flow/client",
     "dev:api": "pnpm nx serve @deploy-flow/api",
     "graphql-schema-generate:api": "pnpm nx run @deploy-flow/api:graphql-schema-generate",
+    "graphql-codegen:client": "pnpm run graphql-schema-generate:api && pnpm exec graphql-codegen --config codegen.yml",
     "build": "pnpm nx run-many -t build --projects=@deploy-flow/client,@deploy-flow/api",
     "lint": "pnpm nx run-many -t lint --projects=@deploy-flow/client,@deploy-flow/api -- --max-warnings=0",
     "lint:fix": "pnpm nx run-many -t lint --projects=@deploy-flow/client,@deploy-flow/api -- --fix",
@@ -16,6 +17,10 @@
   "private": true,
   "devDependencies": {
     "@eslint/js": "^9.8.0",
+    "@graphql-codegen/cli": "^6.2.1",
+    "@graphql-codegen/typescript": "^5.0.9",
+    "@graphql-codegen/typescript-operations": "^5.0.9",
+    "@graphql-codegen/typescript-react-apollo": "^4.4.1",
     "@nx/cypress": "22.5.1",
     "@nx/eslint": "22.5.1",
     "@nx/eslint-plugin": "22.5.1",

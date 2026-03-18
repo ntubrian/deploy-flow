@@ -1,0 +1,125 @@
+fragment CatalogAssetFields on Asset {
+  id
+  altText
+  url
+}
+
+fragment CatalogCategoryFields on Category {
+  id
+  name
+  sortOrder
+}
+
+fragment CatalogOrganizationListItem on Organization {
+  id
+  name
+  summary
+  logo {
+    ...CatalogAssetFields
+  }
+  categories {
+    ...CatalogCategoryFields
+  }
+}
+
+fragment CatalogDonationProjectListItem on DonationProject {
+  id
+  title
+  cover {
+    ...CatalogAssetFields
+  }
+  organization {
+    id
+    name
+  }
+  categories {
+    ...CatalogCategoryFields
+  }
+}
+
+fragment CatalogSaleProductListItem on SaleProduct {
+  id
+  title
+  priceAmount
+  cover {
+    ...CatalogAssetFields
+  }
+  organization {
+    id
+    name
+  }
+  categories {
+    ...CatalogCategoryFields
+  }
+}
+
+query CatalogCategories {
+  categories {
+    ...CatalogCategoryFields
+  }
+}
+
+query CatalogOrganizations(
+  $after: String
+  $categoryId: ID
+  $first: Int
+  $keyword: String
+) {
+  organizations(after: $after, categoryId: $categoryId, first: $first, keyword: $keyword) {
+    edges {
+      cursor
+      node {
+        ...CatalogOrganizationListItem
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+
+query CatalogDonationProjects(
+  $after: String
+  $categoryId: ID
+  $first: Int
+  $keyword: String
+) {
+  donationProjects(
+    after: $after
+    categoryId: $categoryId
+    first: $first
+    keyword: $keyword
+  ) {
+    edges {
+      cursor
+      node {
+        ...CatalogDonationProjectListItem
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+
+query CatalogSaleProducts(
+  $after: String
+  $categoryId: ID
+  $first: Int
+  $keyword: String
+) {
+  saleProducts(after: $after, categoryId: $categoryId, first: $first, keyword: $keyword) {
+    edges {
+      cursor
+      node {
+        ...CatalogSaleProductListItem
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}

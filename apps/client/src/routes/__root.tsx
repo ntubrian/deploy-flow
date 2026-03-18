@@ -1,4 +1,9 @@
+import { ApolloProvider } from '@apollo/client/react'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
+
+import { apolloClient } from '../lib/graphql/apollo-client'
+import '../styles/app.css'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -20,12 +25,14 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="zh-Hant">
       <head>
         <HeadContent />
       </head>
       <body>
-        {children}
+        <NuqsAdapter>
+          <ApolloProvider client={apolloClient}>{children}</ApolloProvider>
+        </NuqsAdapter>
         <Scripts />
       </body>
     </html>

@@ -1,0 +1,18 @@
+schema: ./graphql/schema.graphql
+documents:
+  - ./apps/client/src/graphql/**/*.graphql
+generates:
+  ./apps/client/src/graphql/generated.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    config:
+      addDocBlocks: false
+      apolloReactCommonImportFrom: '@apollo/client'
+      apolloReactHooksImportFrom: '@apollo/client/react'
+      gqlImport: '@apollo/client#gql'
+      reactApolloVersion: 3
+      withComponent: false
+      withHOC: false
+      withHooks: true

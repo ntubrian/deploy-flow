@@ -8,23 +8,29 @@
   "scripts": {
     "dev": "vite dev --port 4200",
     "build": "vite build",
+    "graphql-codegen": "pnpm exec graphql-codegen --config ../../codegen.yml",
     "start": "node .output/server/index.mjs",
     "preview": "vite preview",
     "test": "vitest run"
   },
   "dependencies": {
+    "@apollo/client": "^4.1.6",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-router": "^1.132.0",
     "@tanstack/react-router-devtools": "^1.132.0",
     "@tanstack/react-router-ssr-query": "^1.131.7",
     "@tanstack/react-start": "^1.132.0",
+    "@tanstack/react-virtual": "^3.13.23",
     "@tanstack/router-plugin": "^1.132.0",
     "framer-motion": "^12.37.0",
+    "graphql": "^16.13.1",
     "lucide-react": "^0.545.0",
+    "nuqs": "^2.8.9",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "use-debounce": "^10.1.0"
   },
   "devDependencies": {
     "@content-collections/core": "^0.13.1",

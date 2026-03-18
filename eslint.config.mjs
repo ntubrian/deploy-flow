@@ -43,6 +43,7 @@ export default [
       '**/coverage',
       '**/vite.config.*.timestamp*',
       '**/routeTree.gen.ts',
+      '**/src/graphql/generated.ts',
     ],
   },
   {

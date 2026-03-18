@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Helvetica Neue", system-ui, sans-serif;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    background-color: #dcdcdc;
+    color: #1f2937;
+    font-family: var(--font-sans);
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .catalog-spinner {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    border-radius: 9999px;
+    background:
+      repeating-conic-gradient(
+        from -90deg,
+        rgba(0, 0, 0, 0.92) 0deg 14deg,
+        transparent 14deg 45deg
+      );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+    animation: catalog-spinner-rotate 0.9s linear infinite;
+  }
+}
+
+@keyframes catalog-spinner-rotate {
+  to {
+    transform: rotate(1turn);
+  }
+}
