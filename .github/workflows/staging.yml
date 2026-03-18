@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - staging
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'CHANGELOG.md'
   workflow_dispatch:
 
 permissions:
