@@ -29,7 +29,7 @@
 - Basic Auth password 使用 `WEB_GATE_SHARED_SECRET`
 - staging / production 的 shared secret 預設存放在 AWS Systems Manager Parameter Store `SecureString`
 - EC2 instance 透過 IAM role / instance profile 讀取 shared secret，deploy 時同步產生 Nginx 用的 `deploy/auth/basic.htpasswd`
-- `WEB_GATE_SESSION_SECRET` 目前只保留為後續 cookie/session gate 擴充用，現階段未啟用
+- `WEB_GATE_SESSION_SECRET` 目前只保留為後續 cookie/session gate 擴充用，現階段尚未使用，也不會 set cookie；目前僅採 Basic Auth header auth
 - 若未來需要更細的權限模型、rotation 或登入紀錄，再升級成 session-based gate 或正式身份系統
 
 ## 後端設定來源策略
