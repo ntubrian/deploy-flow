@@ -58,6 +58,31 @@
 - deploy workflow 內的 migration job 應使用與應用程式相同的 SSM 參數來源與 IAM 權限
 - rollback 不應預設自動執行；若 migration 失敗，先停止 release，再依 migration 內容決定人工 rollback 策略
 
+## 部署工具 & 依賴
+
+- GitHub Actions：`.github/workflows/staging.yml`
+- AWS：IAM role、EC2 instance profile、SSM RunCommand、ECR、CloudWatch Logs、Parameter Store `SecureString`
+-  staging EC2 套件：Node.js >=20.19、corepack、pnpm、docker、docker compose
+-  發佈指令：`docker/build-push-action@v6`、`aws-actions/amazon-ecr-login@v2`、`aws-actions/configure-aws-credentials@v4`
+-  相關 docker-compose：`deploy/docker-compose.ec2.yml`、`docker-compose.prod.yml`
+-  nginx basic auth：`deploy/nginx.conf` + `deploy/auth/basic.htpasswd`
+
+## Database & SSM
+
+- 目標 DB：PostgreSQL（local Docker `5433` / staging RDS）
+- migration 控制：`db-migration-show`、`db-migration-run`、`db-migration-generate`、`db-migration-create`
+- seed 指令：`pnpm nx run @deploy-flow/api:db-seed-run`，staging 不自動執行
+- local 時資料來源：`.env` 或 `.env.local`
+- staging/prod 參數來源：SSM Parameter Store
+  - `/deploy-flow/staging/api/database/host`
+  - `/deploy-flow/staging/api/database/port`
+  - `/deploy-flow/staging/api/database/name`
+  - `/deploy-flow/staging/api/database/username`
+  - `/deploy-flow/staging/api/database/password`
+  - `/deploy-flow/staging/api/database/ssl`
+  - `/deploy-flow/staging/api/web-gate/shared-secret`
+  - `/deploy-flow/staging/api/web-gate/session-secret`
+
 ## Local API 開發流程
 
 - 啟動本機 PostgreSQL：`pnpm nx run @deploy-flow/api:dev-db-up`
@@ -97,6 +122,12 @@
 - 未完成：`- [ ] 任務名稱`
 - 完成後再改成：`- [x] 任務名稱（YYYY-MM-DD）`
 - 先不要預先打勾；確認完成後再逐項補日期
+
+## 最近完成（2026-03-18）
+
+- [x] staging deploy workflow corepack install fallback 修正（2026-03-18）
+- [x] show-migrations 允許 `migration.name` undefined 轉換處理（2026-03-18）
+- [x] seed 指令驗證：`pnpm nx run @deploy-flow/api:db-seed-run`（2026-03-18）
 
 ## 前端進度
 
