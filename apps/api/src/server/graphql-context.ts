@@ -7,16 +7,24 @@ import {
 } from '../catalog/repositories';
 import { type AppEnvironment } from '../config/app-env';
 
+export interface GraphqlRequestContext {
+  webGate: {
+    isAuthenticated: boolean;
+  };
+}
+
 export interface GraphqlContext {
   appEnvironment: AppEnvironment;
   dataSource: DataSource;
   loaders: CatalogLoaders;
   repositories: CatalogRepositories;
+  webGate: GraphqlRequestContext['webGate'];
 }
 
 export function createGraphqlContext(
   appEnvironment: AppEnvironment,
-  dataSource: DataSource
+  dataSource: DataSource,
+  requestContext: GraphqlRequestContext
 ): GraphqlContext {
   const repositories = createCatalogRepositories(dataSource);
 
@@ -25,5 +33,6 @@ export function createGraphqlContext(
     dataSource,
     loaders: createCatalogLoaders(repositories),
     repositories,
+    webGate: requestContext.webGate,
   };
 }

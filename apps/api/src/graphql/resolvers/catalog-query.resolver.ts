@@ -1,6 +1,7 @@
 import { Args, Ctx, Query, Resolver } from 'type-graphql';
 
 import { CatalogConnectionArgs } from '../args';
+import { Public } from '../auth/public.decorator';
 import {
   CategoryGraphqlType,
   DonationProjectConnectionGraphqlType,
@@ -42,6 +43,7 @@ export class CatalogQueryResolver {
   @Query(() => String, {
     description: 'Lightweight health check for runtime diagnostics.',
   })
+  @Public()
   health(): string {
     return 'ok';
   }

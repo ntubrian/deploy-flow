@@ -8,13 +8,14 @@ import { DocumentNode } from 'graphql';
 import * as swaggerUi from 'swagger-ui-express';
 import { DataSource } from 'typeorm';
 
+import { isBasicAuthorized } from './basic-auth';
 import { BoundedMemoryCache } from './bounded-memory-cache';
 import { buildOpenApiDocument } from './openapi';
 import { createWebGateMiddleware } from './web-gate';
 import { type AppEnvironment } from '../config/app-env';
 import { getGraphqlSchema } from '../graphql/schema';
 
-import type { GraphqlContext } from './graphql-context';
+import type { GraphqlContext, GraphqlRequestContext } from './graphql-context';
 
 
 export interface ApiApp {
@@ -25,7 +26,8 @@ export interface ApiApp {
 export interface CreateAppOptions {
   createGraphqlContext?: (
     appEnvironment: AppEnvironment,
-    dataSource: DataSource
+    dataSource: DataSource,
+    requestContext: GraphqlRequestContext
   ) => GraphqlContext | Promise<GraphqlContext>;
 }
 
@@ -35,12 +37,17 @@ function shouldEnableDeveloperInterfaces(appEnvironment: AppEnvironment): boolea
 
 async function createDefaultGraphqlContext(
   appEnvironment: AppEnvironment,
-  dataSource: DataSource
+  dataSource: DataSource,
+  requestContext: GraphqlRequestContext
 ): Promise<GraphqlContext> {
   const graphqlContextModule =
     (await import('./graphql-context.js')) as typeof import('./graphql-context');
 
-  return graphqlContextModule.createGraphqlContext(appEnvironment, dataSource);
+  return graphqlContextModule.createGraphqlContext(
+    appEnvironment,
+    dataSource,
+    requestContext
+  );
 }
 
 export async function createApp(
@@ -124,10 +131,18 @@ export async function createApp(
   }
 
   const graphqlHandler = expressMiddleware(apolloServer, {
-    context: async () =>
+    context: async ({ req }) =>
       (options.createGraphqlContext ?? createDefaultGraphqlContext)(
         appEnvironment,
-        dataSource
+        dataSource,
+        {
+          webGate: {
+            isAuthenticated: isBasicAuthorized(
+              req.header('authorization'),
+              appEnvironment
+            ),
+          },
+        }
       ),
   }) as unknown as RequestHandler;
 

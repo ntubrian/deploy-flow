@@ -97,7 +97,10 @@ describe('createApp', () => {
     const apiApp = await createApp(appEnvironment, {
       isInitialized: true,
     } as DataSource, {
-      createGraphqlContext: async () => graphqlContext,
+      createGraphqlContext: async (_appEnvironment, _dataSource, requestContext) => ({
+        ...graphqlContext,
+        webGate: requestContext.webGate,
+      }),
     });
 
     app = apiApp.app;
@@ -142,6 +145,27 @@ describe('createApp', () => {
     });
   });
 
+  it('rejects unauthenticated local GraphQL queries that are not public', async () => {
+    await setup(baseAppEnvironment);
+
+    const response = await request(app).post('/api/graphql').send({
+      query: '{ organizations { edges { cursor } } }',
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toBeNull();
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          extensions: expect.objectContaining({
+            code: 'UNAUTHENTICATED',
+          }),
+          message: 'Unauthorized',
+        }),
+      ])
+    );
+  });
+
   it('serves Apollo Sandbox and Swagger UI in local stage', async () => {
     await setup(baseAppEnvironment);
 
@@ -179,40 +203,43 @@ describe('createApp', () => {
     expect(swaggerResponse.status).toBe(404);
   });
 
-  it('rejects unauthenticated staging GraphQL queries other than health', async () => {
+  it('rejects unauthenticated staging GraphQL queries', async () => {
     await setup({
       ...baseAppEnvironment,
       appStage: 'staging',
     });
 
-    const response = await request(app).post('/api/graphql').send({
+    const organizationsResponse = await request(app).post('/api/graphql').send({
       query: '{ organizations { edges { cursor } } }',
     });
+    const healthResponse = await request(app).post('/api/graphql').send({
+      query: '{ health }',
+    });
 
-    expect(response.status).toBe(401);
-    expect(response.headers['www-authenticate']).toContain('Basic');
-    expect(response.body).toEqual({
+    expect(organizationsResponse.status).toBe(401);
+    expect(organizationsResponse.headers['www-authenticate']).toContain('Basic');
+    expect(organizationsResponse.body).toEqual({
+      error: 'Unauthorized',
+    });
+    expect(healthResponse.status).toBe(401);
+    expect(healthResponse.headers['www-authenticate']).toContain('Basic');
+    expect(healthResponse.body).toEqual({
       error: 'Unauthorized',
     });
   });
 
-  it('allows unauthenticated staging health checks over HTTP and GraphQL', async () => {
+  it('allows unauthenticated staging health checks over HTTP', async () => {
     await setup({
       ...baseAppEnvironment,
       appStage: 'staging',
     });
 
     const healthResponse = await request(app).get('/api/health');
-    const graphqlHealthResponse = await request(app).post('/api/graphql').send({
-      query: '{ health }',
-    });
 
     expect(healthResponse.status).toBe(200);
-    expect(graphqlHealthResponse.status).toBe(200);
-    expect(graphqlHealthResponse.body).toEqual({
-      data: {
-        health: 'ok',
-      },
+    expect(healthResponse.body).toEqual({
+      database: 'up',
+      status: 'ok',
     });
   });
 
